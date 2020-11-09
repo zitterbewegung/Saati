@@ -53,7 +53,7 @@ conda-verify==3.4.2
 contextlib2==0.6.0.post1
 cookiecutter==1.7.2
 coremltools==4.0
-cryptography==2.9.2
+cryptography==3.2
 csvw==1.8.0
 cycler==0.10.0
 Cython @ file:///opt/concourse/worker/volumes/live/6158b663-a4ca-4e19-7e05-8807e4f79146/volume/cython_1594835048880/work
