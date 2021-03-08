@@ -1,0 +1,6 @@
+[submodule "models/gansformer"]
+	path = models/gansformer
+	url = git@github.com:dorarad/gansformer.git
+[submodule "src/redis-pubsub-twilio"]
+	path = src/redis-pubsub-twilio
+	url = git@github.com:gabicavalcante/redis-pubsub-twilio.git
