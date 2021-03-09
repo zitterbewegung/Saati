@@ -1,7 +1,7 @@
 satti
 ==============================
 
-A modular and extendable meta virtual assistant.
+A theraputic virtual agent to decrease anxiety of social interactions.
 
 Development log below: 
 
