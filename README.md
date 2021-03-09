@@ -7,4 +7,4 @@ Development log below:
 
 https://youtu.be/244lvaXevEE
 
-
+This is licenced under the AGPL
