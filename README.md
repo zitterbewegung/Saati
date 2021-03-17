@@ -1,7 +1,12 @@
 satti
 ==============================
 
-A dating simulator to be used both as a virtual agent to decrease anxiety of social interactions.
+A modular and extendable visual vocal assistant. The modules that are planned of highest priority:
+
+1. A socialization simulator
+2. Vocal assistant
+3. Push and pull behavior to provide general reminders
+4. A system to encourage good behavior
 
 Development log below: 
 
