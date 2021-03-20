@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from inference_functions import blenderbot400M, compute_sentiment
+from inference_functions import blenderbot400M, blenderbot3B, compute_sentiment
+
 import uuid, json, pickle, logging
 from typing import List, Any
 
@@ -79,15 +80,17 @@ class Saati(object):
         return 5 < self.sync_ratio and self.sync_ratio < 15
 
 
-def answer_question(body, DATA_FILENAME="state.json"):
+def answer_question(body, identifier, DATA_FILENAME_SUFFIX="state.json"):
     """
     >>> answer_question('hello')
     ' Hello! How are you doing today? I just got back from a walk with my dog.'
     """
+    DATA_FILENAME = "{}_{}".format(identifier, DATA_FILENAME_SUFFIX)
     event_log = []
     log = logging.getLogger('saati.logic')
+    log.debug('Response: {} Identifier {}, State file: {}'.format(body, identifier, DATA_FILENAME))
     log.info('restoring state')
-    if os.path.exists("state.json"):
+    if os.path.exists(DATA_FILENAME):
         with open(DATA_FILENAME, mode='r') as feedsjson:
             event_log = json.load(feedsjson)
             #file_pi2 = open('state.json', 'r') 
@@ -118,7 +121,8 @@ def answer_question(body, DATA_FILENAME="state.json"):
     
 
     log.info("Computing reply")
-    responce = blenderbot400M(body)[0]
+    responce = blenderbot3B(body)[0]
+
     responses.append(responce)
     sentiment = sentiment + compute_sentiment(body)
     interactions = interactions + 1
