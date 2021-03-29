@@ -9,7 +9,7 @@ from flask import render_template
 import os
 import speech_recognition as sr
 from translate import Translator
-from .core2 import answer_question
+from logic import answer_question
 from config import *
 from twilio.twiml.messaging_response import MessagingResponse
 
