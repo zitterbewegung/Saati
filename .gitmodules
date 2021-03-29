@@ -13,3 +13,6 @@
 [submodule "src/shareware"]
 	path = src/shareware
 	url = git@github.com:CryptoWizard89/AICRYPTOART.git
+[submodule "src/MakeItTalk"]
+	path = src/MakeItTalk
+	url = git@github.com:yzhou359/MakeItTalk.git
