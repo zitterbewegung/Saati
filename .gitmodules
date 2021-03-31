@@ -16,3 +16,6 @@
 [submodule "src/MakeItTalk"]
 	path = src/MakeItTalk
 	url = git@github.com:yzhou359/MakeItTalk.git
+[submodule "src/perceiver-pytorch"]
+	path = src/perceiver-pytorch
+	url = https://github.com/lucidrains/perceiver-pytorch.git
