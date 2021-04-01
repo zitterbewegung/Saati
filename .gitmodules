@@ -4,3 +4,18 @@
 [submodule "src/redis-pubsub-twilio"]
 	path = src/redis-pubsub-twilio
 	url = git@github.com:gabicavalcante/redis-pubsub-twilio.git
+[submodule "src/face-of-art"]
+	path = src/face-of-art
+	url = git@github.com:papulke/face-of-art.git
+[submodule "src/talking-head-anime-2-demo"]
+	path = src/talking-head-anime-2-demo
+	url = git@github.com:pkhungurn/talking-head-anime-2-demo.git
+[submodule "src/shareware"]
+	path = src/shareware
+	url = git@github.com:CryptoWizard89/AICRYPTOART.git
+[submodule "src/MakeItTalk"]
+	path = src/MakeItTalk
+	url = git@github.com:yzhou359/MakeItTalk.git
+[submodule "src/perceiver-pytorch"]
+	path = src/perceiver-pytorch
+	url = https://github.com/lucidrains/perceiver-pytorch.git

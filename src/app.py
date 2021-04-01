@@ -11,10 +11,10 @@ import os
 
 import speech_recognition as sr
 from chatterbot import ChatBot
-#from chatterbot.trainers import ChatterBotCorpusTrainer
+from chatterbot.trainers import ChatterBotCorpusTrainer
 from .logic import answer_question, blenderbot400M, blenderbot3B
-from twilio.twiml.messaging_response import MessagingResponse
 
+from twilio.twiml.messaging_response import MessagingResponse
 from .translate import Translator
 from .config import *
 
