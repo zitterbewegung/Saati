@@ -20,7 +20,7 @@ app.logger.addHandler(handler)
 app.logger.setLevel(logging.DEBUG)
 
 #define app routes
-@app.route("/")
+@app.route("/chatbot")
 def index():
     return render_template("chatbot.html")
 

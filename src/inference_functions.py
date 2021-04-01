@@ -12,10 +12,11 @@ import torch
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 from transformers import pipeline, Conversation
 import logging
+from typing import List
 
 conversational_pipeline = pipeline("conversational", device=0)
 
-def blenderbot400M(utterance: str):
+def blenderbot400M(utterance: str) -> List[str]:
 
     tokenizer = AutoTokenizer.from_pretrained("facebook/blenderbot-400M-distill")
     model = AutoModelForSeq2SeqLM.from_pretrained("facebook/blenderbot-400M-distill")
@@ -27,12 +28,20 @@ def blenderbot400M(utterance: str):
     ]
     return responses
 
+def questions(question: str, text: str) -> List[str]:
+    tokenizer = RobertaTokenizer.from_pretrained('ibert-roberta-base')
+    model = IBertForQuestionAnswering.from_pretrained('ibert-roberta-base')
 
-tokenizer = RobertaTokenizer.from_pretrained('ibert-roberta-base')
-model = IBertModel.from_pretrained('ibert-roberta-base')
-inputs = tokenizer("Hello, my dog is cute", return_tensors="pt")
-outputs = model(**inputs)
-last_hidden_states = outputs.last_hidden_state
+    question, text = "Who was Jim Henson?", "Jim Henson was a nice puppet"
+    inputs = tokenizer(question, text, return_tensors='pt')
+    start_positions = torch.tensor([1])
+    end_positions = torch.tensor([3])
+
+    outputs = model(**inputs, start_positions=start_positions, end_positions=end_positions)
+    loss = outputs.loss
+    start_scores = outputs.start_logits
+    end_scores = outputs.end_logits
+    return outputs
 
 def conversation(utterance: str, continuing_conversation=False):
     element_to_access = random.randint(0,len(letters)-1)
@@ -94,3 +103,4 @@ def wav2vec2(audio_utterance: bytes):
     # take argmax and decode
     predicted_ids = torch.argmax(logits, dim=-1)
     transcription = tokenizer.batch_decode(predicted_ids)
+    return transcription

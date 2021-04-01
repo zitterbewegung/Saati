@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from inference_functions import blenderbot400M, blenderbot3B, compute_sentiment
+from .inference_functions import blenderbot400M, blenderbot3B, compute_sentiment
 
 import uuid, json, pickle, logging
 from typing import List, Any
