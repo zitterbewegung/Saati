@@ -1,4 +1,3 @@
-#imports
 from flask import Flask, render_template, request, session, make_response
 #from chatterbot import ChatBot
 #from chatterbot.trainers import ChatterBotCorpusTrainer
@@ -28,15 +27,14 @@ def index():
 #function for the bot response
 def get_bot_response():
     #resp = make_response()
-    #if not request.cookies.get('userID'):
-    #     #resp.set_cookie('userID', session['identifier'])
+    if not request.cookies.get('userID'):
+        resp.set_cookie('userID', session['identifier'])
     
     cookieid = request.cookies.get('userID')
     user_identifier = session.get('identifier', uuid.uuid4())
-    import pdb; pdb.set_trace()
+
     userText = request.args.get('msg')
-    inference = answer_question(userText, user_identifier)
-    #return blenderbot400M(userText)[0]
+    inference = answer_question(userText, user_identifier, 'webchat')
     return inference
 
     #return str(englishBot.get_response(userText))
