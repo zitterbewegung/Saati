@@ -27,8 +27,8 @@ def index():
 #function for the bot response
 def get_bot_response():
     #resp = make_response()
-    if not request.cookies.get('userID'):
-        resp.set_cookie('userID', session['identifier'])
+    #if not request.cookies.get('userID'):
+    #    resp.set_cookie('userID', session['identifier'])
     
     cookieid = request.cookies.get('userID')
     user_identifier = session.get('identifier', uuid.uuid4())

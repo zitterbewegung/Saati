@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from .inference_functions import blenderbot400M, blenderbot3B, compute_sentiment
+from inference_functions import blenderbot400M, blenderbot3B, compute_sentiment
 
 import uuid, json, pickle, logging
 from typing import List, Any
@@ -21,11 +21,11 @@ class Event(BaseModel):
     aggregate_uuid = str
     timestamp: datetime = datetime.now()
     responses: List[str] = []
-    sentiment: int = 1
-    interactions: int = 1
-    sync_ratio: float = 1
+    sentiment: int
+    interactions: int
+    sync_ratio: float
     state_machine: Any
-
+    
 
 class Saati(object):
     def __init__(self, name=uuid.uuid4(), debugMode=False):
@@ -80,7 +80,7 @@ class Saati(object):
         return 5 < self.sync_ratio and self.sync_ratio < 15
 
 
-def answer_question(body, identifier, DATA_FILENAME_SUFFIX="state.json"):
+def answer_question(body, identifier, origin, DATA_FILENAME_SUFFIX="state.json"):
     """
     >>> answer_question('hello')
     ' Hello! How are you doing today? I just got back from a walk with my dog.'
@@ -89,7 +89,7 @@ def answer_question(body, identifier, DATA_FILENAME_SUFFIX="state.json"):
     event_log = []
     log = logging.getLogger('saati.logic')
     log.debug('Response: {} Identifier {}, State file: {}'.format(body, identifier, DATA_FILENAME))
-    log.info('restoring state')
+    #log.info('restoring state')
     if os.path.exists(DATA_FILENAME):
         with open(DATA_FILENAME, mode='r') as feedsjson:
             event_log = json.load(feedsjson)
@@ -121,7 +121,7 @@ def answer_question(body, identifier, DATA_FILENAME_SUFFIX="state.json"):
     
 
     log.info("Computing reply")
-    responce = blenderbot3B(body)[0]
+    responce = blenderbot400M(body)[0]
 
     responses.append(responce)
     sentiment = sentiment + compute_sentiment(body)
@@ -151,10 +151,15 @@ def answer_question(body, identifier, DATA_FILENAME_SUFFIX="state.json"):
                      'sync_ratio' : sync_ratio,
                      'interactions': interactions,
                      #'instance_path' : pickle.dumps(instance),
-                     'request_time':  str(datetime.now())}
+                     'request_time':  str(datetime.now()),
+                     'origin': origin,}
+
+    log.debug("Current state: {}".format(event_log))
+
     with open(DATA_FILENAME, mode='w', encoding='utf-8') as feedsjson:
         event_log.append(current_state)
         json.dump(event_log, feedsjson)
+
         
     return responce
 
