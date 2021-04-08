@@ -15,17 +15,29 @@ from transitions import Machine
 from pathlib import Path
 import os, logging
 
+def greetMe():
+    CurrentHour = int(datetime.now().hour)
+    if CurrentHour >= 0 and CurrentHour < 12:
+        talk("Good Morning!")
 
-class Event(BaseModel):
-    uuid: str = uuid.uuid4()
-    aggregate_uuid = str
-    timestamp: datetime = datetime.now()
-    responses: List[str] = []
-    sentiment: int
-    interactions: int
-    sync_ratio: float
-    state_machine: Any
-    
+    elif CurrentHour >= 12 and CurrentHour < 18:
+        talk("Good Afternoon!")
+
+    elif CurrentHour >= 18 and CurrentHour != 0:
+        talk("Good Evening!")
+
+
+def greet(name):
+    return "Hello " + name + "!"
+
+
+def journal_sleep(response: str):
+    CurrentHour = int(datetime.now().hour)
+    if CurrentHour >= 0 and CurrentHour < 9:
+        talk(" How well did you sleep ? ")
+    elif CurrentHour >= 10 and CurrentHour <= 12:
+        talk(" Did you sleep in? ")
+    return response
 
 class Saati(object):
     def __init__(self, name=uuid.uuid4(), debugMode=False):
@@ -79,17 +91,18 @@ class Saati(object):
         # sync_ratio = self.sentiment / self.interaction_number
         return 5 < self.sync_ratio and self.sync_ratio < 15
 
-
-def answer_question(body, identifier, origin, DATA_FILENAME_SUFFIX="state.json"):
+import sqlite3
+def answer_question(body, identifier, origin, DATA_FILENAME="state.json"):
     """
-    >>> answer_question('hello')
+    >>> answer_question('hello', '709c346d-4188-4a72-adeb-45308840c549', 'webchat')
     ' Hello! How are you doing today? I just got back from a walk with my dog.'
     """
-    DATA_FILENAME = "{}_{}".format(identifier, DATA_FILENAME_SUFFIX)
+    DATA_FILENAME = "{}".format(DATA_FILENAME)
+    
     event_log = []
     log = logging.getLogger('saati.logic')
     log.debug('Response: {} Identifier {}, State file: {}'.format(body, identifier, DATA_FILENAME))
-    #log.info('restoring state')
+    log.info('restoring state')
     if os.path.exists(DATA_FILENAME):
         with open(DATA_FILENAME, mode='r') as feedsjson:
             event_log = json.load(feedsjson)
@@ -98,6 +111,8 @@ def answer_question(body, identifier, origin, DATA_FILENAME_SUFFIX="state.json")
     else:
         with open(DATA_FILENAME, mode='w', encoding='utf-8') as f:
             json.dump([], f)
+    
+    #state = event_log.get(identifier, {})
     state = {}  
     if event_log != []:
         state = event_log[-1]
@@ -157,7 +172,7 @@ def answer_question(body, identifier, origin, DATA_FILENAME_SUFFIX="state.json")
     log.debug("Current state: {}".format(event_log))
 
     with open(DATA_FILENAME, mode='w', encoding='utf-8') as feedsjson:
-        event_log.append(current_state)
+        event_log[identifier].append(current_state)
         json.dump(event_log, feedsjson)
 
         
@@ -189,5 +204,6 @@ class CoffeeLevel(object):
         )
 
 if __name__ == "__main__":
+    answer_question("hello", "709", "temp", "test_state.json")
     import doctest
     doctest.testmod()
