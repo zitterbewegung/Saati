@@ -14,6 +14,8 @@ from transitions.extensions import HierarchicalMachine as Machine
 from transitions import Machine
 from pathlib import Path
 import os, logging
+import pandas as pd
+from sqlalchemy import create_engine
 
 def greetMe():
     CurrentHour = int(datetime.now().hour)
@@ -91,7 +93,7 @@ class Saati(object):
         # sync_ratio = self.sentiment / self.interaction_number
         return 5 < self.sync_ratio and self.sync_ratio < 15
 
-import sqlite3
+
 def answer_question(body, identifier, origin, DATA_FILENAME="state.json"):
     """
     >>> answer_question('hello', '709c346d-4188-4a72-adeb-45308840c549', 'webchat')
@@ -150,6 +152,11 @@ def answer_question(body, identifier, origin, DATA_FILENAME="state.json"):
             str(instance.state),
         )
     )
+    engine = create_engine('sqlite://', echo=False)
+    df = pd.DataFrame({'name' : ['User 1', 'User 2', 'User 3']})
+
+    
+
 
     if 5 >= sync_ratio <= 11 or interactions < 10:
         
@@ -168,7 +175,9 @@ def answer_question(body, identifier, origin, DATA_FILENAME="state.json"):
                      #'instance_path' : pickle.dumps(instance),
                      'request_time':  str(datetime.now()),
                      'origin': origin,}
-
+    with engine.begin() as connection:
+        state_df = pd.DataFrame({"identifier" : identifier, 'response': response, 'sentiment': sentiment, "sync_ratio": sync_ratio, "interactions": interactions, "request": body, "identifier": identifier, "origin": origin})
+        state_df.to_sql('interactions', con=connection, if_exists='append') 
     log.debug("Current state: {}".format(event_log))
 
     with open(DATA_FILENAME, mode='w', encoding='utf-8') as feedsjson:
