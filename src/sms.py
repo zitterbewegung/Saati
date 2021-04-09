@@ -48,18 +48,18 @@ def sms_reply():
         pass
         #Lookup a user
         
-        
+      
     DATA_FILENAME = '{}-state.json'.format(request.values['From'])
     if not responded:
         event_log = []
-        if os.path.exists("state.json"):
+        if os.path.exists(DATA_FILENAME):
             with open(DATA_FILENAME, mode='r', encoding='utf-8') as feedsjson:
                 event_log = json.load(feedsjson)
                 
         else:
             with open(DATA_FILENAME, mode='w', encoding='utf-8') as f:
                 json.dump([], f)
-
+        state = {}
         if event_log != []:
             state = event_log[-1]
         sentiment = state.get('sentiment', 1)
@@ -116,10 +116,10 @@ def sms_reply():
             responce = "Hey, lets stay friends"
             instance.friendzone()
         #file = open('state.pkl', 'wb')
-        with engine.begin() as connection:
-            state_df = pd.DataFrame({"identifier" : identifier, 'response': response, 'sentiment': sentiment, "sync_ratio": sync_ratio, "interactions": interactions, "request": body, "identifier": identifier, "origin": origin})
-            state_df.to_sql('interactions', con=connection, if_exists='append') 
-            log.debug("Current state: {}".format(event_log))
+        #with engine.begin() as connection:
+        #    state_df = pd.DataFrame({"identifier" : identifier, 'response': response, 'sentiment': sentiment, "sync_ratio": sync_ratio, "interactions": interactions, "request": body, "identifier": identifier, "origin": origin})
+        #    state_df.to_sql('interactions', con=connection, if_exists='append') 
+        #    log.debug("Current state: {}".format(event_log))
 
         current_state = {'responses': responses,
                          'sentiment': sentiment,
@@ -136,5 +136,5 @@ def sms_reply():
 
 
 if __name__ == "__main__":
-    app.run(debug=False, port=5001)
+    app.run(debug=True, port=5001)
     print(message.sid)
