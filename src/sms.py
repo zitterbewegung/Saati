@@ -65,9 +65,15 @@ def sms_reply():
         sentiment = state.get('sentiment', 1)
         #sentiment = 1
         interactions = state.get('interactions', 1)
+        positive_interactions = state.get('positive_interactions', 1)
        
         #interactions = 1
-        sync_ratio = sentiment / interactions
+        if sentiment > 0:
+            positive_interactions = positive_interactions + 1
+        else:
+            positive_interactions = positive_interactions - 1
+
+        sync_ratio = positive_interactions / interactions
         responses = state.get('responses', [])
 
         instance = Saati(uuid.uuid4())
@@ -125,8 +131,10 @@ def sms_reply():
                          'sentiment': sentiment,
                          'sync_ratio' : sync_ratio,
                          'interactions': interactions,
+                         'positive_interactions': positive_interactions,
                          'instance.state' : instance.state,
-                         'request_time':  str(datetime.datetime.now())
+                         'request_time':  str(datetime.datetime.now()),
+                         'identifier' : request.values['From'],
                          }
         with open(DATA_FILENAME, mode='w', encoding='utf-8') as feedsjson:
             event_log.append(current_state)
