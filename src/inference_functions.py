@@ -12,7 +12,7 @@ import torch
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 from transformers import pipeline, Conversation
 import logging
-from typing import List
+from typing import List, Any, Tuple
 
 conversational_pipeline = pipeline("conversational", device=0)
 
@@ -42,6 +42,24 @@ def questions(question: str, text: str) -> List[str]:
     start_scores = outputs.start_logits
     end_scores = outputs.end_logits
     return outputs
+
+def general_questions(question: str, text: str) -> List[str]:
+    nlp = pipeline("question-answering")
+    return nlp
+    #tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased-distilled-squad")
+
+    #model = AutoModelForQuestionAnswering.from_pretrained("distilbert-base-uncased-distilled-squad")
+
+def checkpoint_optimization(utterance: str, checkpoint: Any) -> Tuple[str]:
+    # instantiate sentence fusion model
+    sentence_fuser = EncoderDecoderModel.from_pretrained("google/roberta2roberta_L-24_discofuse")
+    tokenizer = AutoTokenizer.from_pretrained("google/roberta2roberta_L-24_discofuse")
+
+    input_ids = tokenizer('This is the first sentence. This is the second sentence.', add_special_tokens=False, return_tensors="pt").input_ids
+
+    outputs = sentence_fuser.generate(input_ids)
+
+    print(tokenizer.decode(outputs[0]))
 
 def conversation(utterance: str, continuing_conversation=False):
     element_to_access = random.randint(0,len(letters)-1)
@@ -104,3 +122,21 @@ def wav2vec2(audio_utterance: bytes):
     predicted_ids = torch.argmax(logits, dim=-1)
     transcription = tokenizer.batch_decode(predicted_ids)
     return transcription
+
+def codeBert(code: str) -> List[str]:
+    """
+    PYTHON_CODE = '''
+        def pipeline(
+            task: str,
+            model: Optional = None,
+            framework: Optional[<mask>] = None,
+            **kwargs
+        ) -> Pipeline:
+            pass
+        '''.lstrip()
+    """
+    tokenizer = AutoTokenizer.from_pretrained("microsoft/CodeGPT-small-py")
+    model = AutoModelWithLMHead.from_pretrained("microsoft/CodeGPT-small-py")
+
+
+    
