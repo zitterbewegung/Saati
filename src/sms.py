@@ -5,7 +5,7 @@ from twilio.rest import Client
 from flask import Flask, request, redirect
 from twilio.twiml.messaging_response import MessagingResponse
 from logic import Saati#, compute_sentiment
-from inference_functions import compute_sentiment, blenderbot400M
+from inference_functions import compute_sentiment, blenderbot400M, blenderbot1B
 import uuid, logging, os, pickle, json, datetime
 from logic import answer_question
 
@@ -28,7 +28,7 @@ responses = []
 # user_input = input #GivenCommand()
 
 
-@app.route("/", methods=["GET", "POST"])
+@app.route("/sms", methods=["GET", "POST"])
 def sms_reply():
     """Respond to incoming calls with a simple text message."""
     
@@ -63,7 +63,7 @@ def sms_reply():
         if event_log != []:
             state = event_log[-1]
         sentiment = state.get('sentiment', 1)
-        #sentiment = 1
+     
         interactions = state.get('interactions', 1)
         positive_interactions = state.get('positive_interactions', 1)
        
@@ -90,7 +90,7 @@ def sms_reply():
         
         #answer_question(incoming_msg)
         responce = blenderbot400M(incoming_msg)[0]
-        
+        #responce = blenderbot1B(incoming_msg)[0]
         message = client.messages.create(
             body=responce,  # Join Earth's mightiest heroes. Like Kevin Bacon.",
             from_="17784035044",
@@ -114,9 +114,19 @@ def sms_reply():
                 str(instance.state),
             )
         )
+        current_state = {'responses': responses,
+                    'sentiment': sentiment,
+                    'sync_ratio' : sync_ratio,
+                    'interactions': interactions,
+                    'positive_interactions': positive_interactions,
+                    'instance.state' : instance.state,
+                    'request_time':  str(datetime.datetime.now()),
+                    'identifier' : request.values['From'],
+                    'origin' : "sms"
+                    }
 
         if 5 >= sync_ratio <= 11 or interactions < 10:
-
+            
             instance.next_state()
         else:
             responce = "Hey, lets stay friends"
@@ -127,15 +137,8 @@ def sms_reply():
         #    state_df.to_sql('interactions', con=connection, if_exists='append') 
         #    log.debug("Current state: {}".format(event_log))
 
-        current_state = {'responses': responses,
-                         'sentiment': sentiment,
-                         'sync_ratio' : sync_ratio,
-                         'interactions': interactions,
-                         'positive_interactions': positive_interactions,
-                         'instance.state' : instance.state,
-                         'request_time':  str(datetime.datetime.now()),
-                         'identifier' : request.values['From'],
-                         }
+
+
         with open(DATA_FILENAME, mode='w', encoding='utf-8') as feedsjson:
             event_log.append(current_state)
             json.dump(event_log, feedsjson)
