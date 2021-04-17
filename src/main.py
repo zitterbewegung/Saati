@@ -82,18 +82,28 @@ def home(request: Request):
 #    return templates.TemplateResponse("index.html", {"request": request})
 #    #return render_template("chatbot.html")
 
+#class UserInput(BaseModel):
+    
+
 #function for the bot response
-def get_bot_response():
+class Msg(BaseModel):
+    msg: str
+
+@app.get("/get")
+def get_bot_response(msg: Msg):
+    
     #resp = make_response()
     #if not request.cookies.get('userID'):
     #    resp.set_cookie('userID', session['identifier'])
     
-    cookieid = request.cookies.get('userID')
-    user_identifier = session.get('identifier', uuid.uuid4())
+    #cookieid = request.cookies.get('userID')
+    user_identifier = "1" #session.get('identifier', uuid.uuid4())
+    
+    userText = msg #request.get('msg')
 
-    userText = request.args.get('msg')
     inference = answer_question(userText, user_identifier, 'webchat')
-    return inference
+    return Response(content=inference, media_type="text/plain")
+    #return inference
 
     #return str(englishBot.get_response(userText))
 

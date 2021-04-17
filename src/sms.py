@@ -4,8 +4,8 @@
 from twilio.rest import Client
 from flask import Flask, request, redirect
 from twilio.twiml.messaging_response import MessagingResponse
-from core2 import Saati#, compute_sentiment
-from inference_functions import compute_sentiment, blenderbot400M
+from logic import Saati#, compute_sentiment
+from inference_functions import compute_sentiment, blenderbot400M, blenderbot1B
 import uuid, logging, os, pickle, json, datetime
 from logic import answer_question
 
@@ -28,7 +28,7 @@ responses = []
 # user_input = input #GivenCommand()
 
 
-@app.route("/", methods=["GET", "POST"])
+@app.route("/sms", methods=["GET", "POST"])
 def sms_reply():
     """Respond to incoming calls with a simple text message."""
     
@@ -48,27 +48,32 @@ def sms_reply():
         pass
         #Lookup a user
         
-        
-    DATA_FILENAME = 'state.json'
+      
+    DATA_FILENAME = '{}-state.json'.format(request.values['From'])
     if not responded:
         event_log = []
-        if os.path.exists("state.json"):
+        if os.path.exists(DATA_FILENAME):
             with open(DATA_FILENAME, mode='r', encoding='utf-8') as feedsjson:
                 event_log = json.load(feedsjson)
-            #file_pi2 = open('state.json', 'r') 
-            #state = file_pi2
+                
         else:
             with open(DATA_FILENAME, mode='w', encoding='utf-8') as f:
                 json.dump([], f)
-
+        state = {}
         if event_log != []:
             state = event_log[-1]
         sentiment = state.get('sentiment', 1)
-        #sentiment = 1
+     
         interactions = state.get('interactions', 1)
+        positive_interactions = state.get('positive_interactions', 1)
        
         #interactions = 1
-        sync_ratio = sentiment / interactions
+        if sentiment > 0:
+            positive_interactions = positive_interactions + 1
+        else:
+            positive_interactions = positive_interactions - 1
+
+        sync_ratio = positive_interactions / interactions
         responses = state.get('responses', [])
 
         instance = Saati(uuid.uuid4())
@@ -85,7 +90,7 @@ def sms_reply():
         
         #answer_question(incoming_msg)
         responce = blenderbot400M(incoming_msg)[0]
-        
+        #responce = blenderbot1B(incoming_msg)[0]
         message = client.messages.create(
             body=responce,  # Join Earth's mightiest heroes. Like Kevin Bacon.",
             from_="17784035044",
@@ -109,20 +114,31 @@ def sms_reply():
                 str(instance.state),
             )
         )
+        current_state = {'responses': responses,
+                    'sentiment': sentiment,
+                    'sync_ratio' : sync_ratio,
+                    'interactions': interactions,
+                    'positive_interactions': positive_interactions,
+                    'instance.state' : instance.state,
+                    'request_time':  str(datetime.datetime.now()),
+                    'identifier' : request.values['From'],
+                    'origin' : "sms"
+                    }
 
         if 5 >= sync_ratio <= 11 or interactions < 10:
-
+            
             instance.next_state()
         else:
-            talk("Hey, lets stay friends")
+            responce = "Hey, lets stay friends"
             instance.friendzone()
         #file = open('state.pkl', 'wb')
-        current_state = {'responses': responses,
-                         'sentiment': sentiment,
-                         'sync_ratio' : sync_ratio,
-                         'interactions': interactions,
-                         'instance.state' : instance.state,
-                         'request_time':  str(datetime.datetime.now())}
+        #with engine.begin() as connection:
+        #    state_df = pd.DataFrame({"identifier" : identifier, 'response': response, 'sentiment': sentiment, "sync_ratio": sync_ratio, "interactions": interactions, "request": body, "identifier": identifier, "origin": origin})
+        #    state_df.to_sql('interactions', con=connection, if_exists='append') 
+        #    log.debug("Current state: {}".format(event_log))
+
+
+
         with open(DATA_FILENAME, mode='w', encoding='utf-8') as feedsjson:
             event_log.append(current_state)
             json.dump(event_log, feedsjson)
@@ -131,5 +147,5 @@ def sms_reply():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=5001)
     print(message.sid)

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from .inference_functions import blenderbot400M, blenderbot3B, compute_sentiment
+from inference_functions import blenderbot400M, blenderbot3B, compute_sentiment
 
 import uuid, json, pickle, logging
 from typing import List, Any
@@ -14,18 +14,32 @@ from transitions.extensions import HierarchicalMachine as Machine
 from transitions import Machine
 from pathlib import Path
 import os, logging
+import pandas as pd
+from sqlalchemy import create_engine
+
+def greetMe():
+    CurrentHour = int(datetime.now().hour)
+    if CurrentHour >= 0 and CurrentHour < 12:
+        talk("Good Morning!")
+
+    elif CurrentHour >= 12 and CurrentHour < 18:
+        talk("Good Afternoon!")
+
+    elif CurrentHour >= 18 and CurrentHour != 0:
+        talk("Good Evening!")
 
 
-class Event(BaseModel):
-    uuid: str = uuid.uuid4()
-    aggregate_uuid = str
-    timestamp: datetime = datetime.now()
-    responses: List[str] = []
-    sentiment: int = 1
-    interactions: int = 1
-    sync_ratio: float = 1
-    state_machine: Any
+def greet(name):
+    return "Hello " + name + "!"
 
+
+def journal_sleep(response: str):
+    CurrentHour = int(datetime.now().hour)
+    if CurrentHour >= 0 and CurrentHour < 9:
+        talk(" How well did you sleep ? ")
+    elif CurrentHour >= 10 and CurrentHour <= 12:
+        talk(" Did you sleep in? ")
+    return response
 
 class Saati(object):
     def __init__(self, name=uuid.uuid4(), debugMode=False):
@@ -80,21 +94,23 @@ class Saati(object):
         return 5 < self.sync_ratio and self.sync_ratio < 15
 
 
-def answer_question(body, identifier, DATA_FILENAME_SUFFIX="state.json"):
+
+
+def answer_question(body, identifier, origin):
     """
-    >>> answer_question('hello')
+    >>> answer_question('hello', '709c346d-4188-4a72-adeb-45308840c549', 'webchat')
     ' Hello! How are you doing today? I just got back from a walk with my dog.'
     """
-    DATA_FILENAME = "{}_{}".format(identifier, DATA_FILENAME_SUFFIX)
+    DATA_FILENAME = '{}-state.json'.format(identifier)
+    
     event_log = []
     log = logging.getLogger('saati.logic')
     log.debug('Response: {} Identifier {}, State file: {}'.format(body, identifier, DATA_FILENAME))
     log.info('restoring state')
     if os.path.exists(DATA_FILENAME):
-        with open(DATA_FILENAME, mode='r') as feedsjson:
+        with open(DATA_FILENAME, mode='r', encoding='utf-8') as feedsjson:
             event_log = json.load(feedsjson)
-            #file_pi2 = open('state.json', 'r') 
-            #state = file_pi2
+            
     else:
         with open(DATA_FILENAME, mode='w', encoding='utf-8') as f:
             json.dump([], f)
@@ -104,9 +120,10 @@ def answer_question(body, identifier, DATA_FILENAME_SUFFIX="state.json"):
     sentiment = state.get('sentiment', 1)
     #sentiment = 1
     interactions = state.get('interactions', 1)
+    positive_interactions = state.get('positive_interactions', 1)
+       
 
-    #interactions = 1
-    sync_ratio = sentiment / interactions
+
     responses = state.get('responses', [])
 
     instance_from_log = [
@@ -121,10 +138,20 @@ def answer_question(body, identifier, DATA_FILENAME_SUFFIX="state.json"):
     
 
     log.info("Computing reply")
-    responce = blenderbot3B(body)[0]
+    responce = blenderbot400M(body)[0] 
 
     responses.append(responce)
     sentiment = sentiment + compute_sentiment(body)
+
+    #interactions = 1
+    if sentiment > 0:
+        positive_interactions = positive_interactions + 1
+    
+    if sentiment < 0:
+        positive_interactions = positive_interactions - 1
+    #interactions = 1
+    sync_ratio = positive_interactions / interactions
+
     interactions = interactions + 1
     log.info(
         "Responses: {} Sentiment: {}  Sync ratio: {} Interactions: {}	| Current State {}".format(
@@ -135,7 +162,10 @@ def answer_question(body, identifier, DATA_FILENAME_SUFFIX="state.json"):
             str(instance.state),
         )
     )
+    #engine = create_engine('sqlite://', echo=False)
+    #df = pd.DataFrame({'name' : ['User 1', 'User 2', 'User 3']})
 
+    
     if 5 >= sync_ratio <= 11 or interactions < 10:
         
         instance.next_state()
@@ -147,14 +177,21 @@ def answer_question(body, identifier, DATA_FILENAME_SUFFIX="state.json"):
     #dump = pickle.dumps(m)
 
     current_state = {'responses': responses,
-                     'sentiment': sentiment,
-                     'sync_ratio' : sync_ratio,
-                     'interactions': interactions,
-                     #'instance_path' : pickle.dumps(instance),
-                     'request_time':  str(datetime.now())}
+                    'sentiment': sentiment,
+                    'sync_ratio' : sync_ratio,
+                    'interactions': interactions,
+                    'positive_interactions': positive_interactions,
+                    'instance.state' : instance.state,
+                    'request_time':  str(datetime.now()),
+                    'identifier' : identifier,
+                    'origin' : origin
+                    }
+
+
     with open(DATA_FILENAME, mode='w', encoding='utf-8') as feedsjson:
         event_log.append(current_state)
         json.dump(event_log, feedsjson)
+
         
     return responce
 
@@ -184,5 +221,6 @@ class CoffeeLevel(object):
         )
 
 if __name__ == "__main__":
+    answer_question("hello", "709", "temp", "test_state.json")
     import doctest
     doctest.testmod()
