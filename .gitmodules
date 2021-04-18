@@ -19,3 +19,12 @@
 [submodule "src/perceiver-pytorch"]
 	path = src/perceiver-pytorch
 	url = https://github.com/lucidrains/perceiver-pytorch.git
+[submodule "app/Deploy-BERT-for-Sentiment-Analysis-with-FastAPI"]
+	path = app/Deploy-BERT-for-Sentiment-Analysis-with-FastAPI
+	url = https://github.com/curiousily/Deploy-BERT-for-Sentiment-Analysis-with-FastAPI
+[submodule "app/elastic_transformers"]
+	path = app/elastic_transformers
+	url = https://github.com/md-experiments/elastic_transformers
+[submodule "app/redis-pubsub-twilio"]
+	path = app/redis-pubsub-twilio
+	url = https://github.com/gabicavalcante/redis-pubsub-twilio

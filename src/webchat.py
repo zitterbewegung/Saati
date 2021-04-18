@@ -7,14 +7,14 @@ import sys, logging, uuid
 app = Flask('saati')
 app.secret_key = b'34-1q98ghb3q4tg89u'
 
+
 #create chatbot
 #englishBot = ChatBot("Chatterbot", storage_adapter="chatterbot.storage.SQLStorageAdapter")
 #trainer = ChatterBotCorpusTrainer(englishBot)
 #trainer.train("chatterbot.corpus.english") #train the chatter bot for english
 
 handler = logging.StreamHandler(sys.stdout)
-handler.setFormatter(logging.Formatter(
-    '%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
 app.logger.addHandler(handler)
 app.logger.setLevel(logging.DEBUG)
 
@@ -40,4 +40,4 @@ def get_bot_response():
     #return str(englishBot.get_response(userText))
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=5002)
