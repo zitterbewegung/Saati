@@ -52,6 +52,9 @@ class Saati(object):
 
         # Interaction_number
         self.interactions = 1
+        self.positive_interactions = 1
+        self.negative_interactions = 1
+
 
         self.sync_ratio = 1.0
 
@@ -78,7 +81,7 @@ class Saati(object):
 
     def update_sync_ratio(self):
         """ Dear Diary, today I saved Mr. Whiskers. Again. """
-        self.sync_ratio = self.sentiment / self.interactions
+        self.sync_ratio = self.positive_interactions / self.negative_interactions
 
     @property
     def is_disliked(self):
@@ -118,10 +121,11 @@ def answer_question(body, identifier, origin):
     if event_log != []:
         state = event_log[-1]
     sentiment = state.get('sentiment', 1)
-    #sentiment = 1
+
     interactions = state.get('interactions', 1)
     positive_interactions = state.get('positive_interactions', 1)
-       
+    negative_interactions = state.get('negative_interactions', 1)
+    sync_ratio = state.get('sync_ratio', 1)
 
 
     responses = state.get('responses', [])
@@ -130,12 +134,11 @@ def answer_question(body, identifier, origin):
         str(responses),
         str(sentiment),
         str(sync_ratio),
-        str(interactions),
-        str(state.get('instance.state')),
+        str(positive_interactions),
+        str(negative_interactions)
+        #str(state.get('instance.state')),
     ]
     instance = Saati(uuid.uuid4(), instance_from_log)
-    
-    
 
     log.info("Computing reply")
     responce = blenderbot400M(body)[0] 
@@ -143,14 +146,13 @@ def answer_question(body, identifier, origin):
     responses.append(responce)
     sentiment = sentiment + compute_sentiment(body)
 
-    #interactions = 1
     if sentiment > 0:
         positive_interactions = positive_interactions + 1
     
     if sentiment < 0:
-        positive_interactions = positive_interactions - 1
-    #interactions = 1
-    sync_ratio = positive_interactions / interactions
+        negative_interactions = negative_interactions + 1
+
+    sync_ratio = positive_interactions / negative_interactions
 
     interactions = interactions + 1
     log.info(
@@ -166,8 +168,8 @@ def answer_question(body, identifier, origin):
     #df = pd.DataFrame({'name' : ['User 1', 'User 2', 'User 3']})
 
     
-    if 5 >= sync_ratio <= 11 or interactions < 10:
-        
+    if 5 >= sync_ratio <= 11 and interactions < 5:
+        instance.update_sync_ratio()
         instance.next_state()
     else:
         #talk("Hey, lets stay friends")
