@@ -5,7 +5,6 @@ from logic import answer_question
 import sys, logging, uuid
 
 app = Flask('saati')
-app.secret_key = b'34-1q98ghb3q4tg89u'
 
 
 #create chatbot
@@ -19,21 +18,34 @@ app.logger.addHandler(handler)
 app.logger.setLevel(logging.DEBUG)
 
 #define app routes
-@app.route("/chatbot")
+@app.route("/")
 def index():
+    #user_identifier = session.get('identifier', uuid.uuid4())
+    #resp.set_cookie('userID', session['identifier'])
     return render_template("chatbot.html")
+
+#@app.route('/setcookie', methods = ['POST', 'GET'])
+#def setcookie():
+#   if request.method == 'POST':
+#    user = request.form['nm']
+   
+#   resp = make_response(render_template('readcookie.html'))
+#   resp.set_cookie('userID', user)
+   
+#   return resp
 
 @app.route("/get")
 #function for the bot response
 def get_bot_response():
     #resp = make_response()
     #if not request.cookies.get('userID'):
-    #    resp.set_cookie('userID', session['identifier'])
+    #   
     
     cookieid = request.cookies.get('userID')
-    user_identifier = session.get('identifier', uuid.uuid4())
+    #user_identifier = session.get('identifier', uuid.uuid4())
 
     userText = request.args.get('msg')
+    user_identifier = str(request.remote_addr)
     inference = answer_question(userText, user_identifier, 'webchat')
     return inference
 

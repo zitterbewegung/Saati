@@ -1,0 +1,354 @@
+<dl class="docinfo simple">
+<dt class="author">Author</dt>
+<dd class="author"><p>Richard Jones</p></dd>
+<dt class="version">Version</dt>
+<dd class="version">5801</dd>
+<dt class="copyright">Copyright</dt>
+<dd class="copyright">This document has been placed in the public domain.</dd>
+</dl>
+<div class="contents alert alert-info pull-left topic" id="contents">
+<p class="topic-title">Contents</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#structure" id="id16">Structure</a></p></li>
+<li><p><a class="reference internal" href="#text-styles" id="id17">Text styles</a></p></li>
+<li><p><a class="reference internal" href="#lists" id="id18">Lists</a></p></li>
+<li><p><a class="reference internal" href="#preformatting-code-samples" id="id19">Preformatting (code samples)</a></p></li>
+<li><p><a class="reference internal" href="#sections" id="id20">Sections</a></p>
+<ul>
+<li><p><a class="reference internal" href="#document-title-subtitle" id="id21">Document Title / Subtitle</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#images" id="id22">Images</a></p></li>
+<li><p><a class="reference internal" href="#what-next" id="id23">What Next?</a></p></li>
+</ul>
+</div>
+<p>The text below contains links that look like &quot;(<a class="reference external" href="../quickref/">quickref</a>)&quot;.  These
+are relative links that point to the <a class="reference external" href="../quickref/">Quick reStructuredText</a> user
+reference.  If these links don't work, please refer to the <a class="reference external" href="https://docutils.sourceforge.io/docs/user/rst/quickref.html">master
+quick reference</a> document.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This document is an informal introduction to
+reStructuredText.  The <a class="reference internal" href="#what-next">What Next?</a> section below has links to
+further resources, including a formal reference.</p>
+</div>
+<section id="structure">
+<h1><a class="toc-backref" href="#id16">Structure</a></h1>
+<p>From the outset, let me say that &quot;Structured Text&quot; is probably a bit
+of a misnomer.  It's more like &quot;Relaxed Text&quot; that uses certain
+consistent patterns.  These patterns are interpreted by a HTML
+converter to produce &quot;Very Structured Text&quot; that can be used by a web
+browser.</p>
+<p>The most basic pattern recognised is a <strong>paragraph</strong> (<a class="reference external" href="../quickref/#paragraphs">quickref</a>).
+That's a chunk of text that is separated by blank lines (one is
+enough).  Paragraphs must have the same indentation -- that is, line
+up at their left edge.  Paragraphs that start indented will result in
+indented quote paragraphs. For example:</p>
+<pre class="literal-block">This is a paragraph.  It's quite
+short.
+
+   This paragraph will result in an indented block of
+   text, typically used for quoting other text.
+
+This is another one.</pre>
+<p>Results in:</p>
+<blockquote>
+<p>This is a paragraph.  It's quite
+short.</p>
+<blockquote>
+<p>This paragraph will result in an indented block of
+text, typically used for quoting other text.</p>
+</blockquote>
+<p>This is another one.</p>
+</blockquote>
+</section>
+<section id="text-styles">
+<h1><a class="toc-backref" href="#id17">Text styles</a></h1>
+<p>(<a class="reference external" href="../quickref/#inline-markup">quickref</a>)</p>
+<p>Inside paragraphs and other bodies of text, you may additionally mark
+text for <em>italics</em> with &quot;<code class="docutils literal">*italics*</code>&quot; or <strong>bold</strong> with
+&quot;<code class="docutils literal">**bold**</code>&quot;.  This is called &quot;inline markup&quot;.</p>
+<p>If you want something to appear as a fixed-space literal, use
+&quot;<code class="docutils literal">``double <span class="pre">back-quotes``</span></code>&quot;.  Note that no further fiddling is done
+inside the double back-quotes -- so asterisks &quot;<code class="docutils literal">*</code>&quot; etc. are left
+alone.</p>
+<p>If you find that you want to use one of the &quot;special&quot; characters in
+text, it will generally be OK -- reStructuredText is pretty smart.
+For example, this lone asterisk * is handled just fine, as is the
+asterisk in this equation: 5*6=30.  If you actually
+want text *surrounded by asterisks* to <strong>not</strong> be italicised, then
+you need to indicate that the asterisk is not special.  You do this by
+placing a backslash just before it, like so &quot;<code class="docutils literal">\*</code>&quot; (<a class="reference external" href="../quickref/#escaping">quickref</a>), or
+by enclosing it in double back-quotes (inline literals), like this:</p>
+<pre class="literal-block">``*``</pre>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Think of inline markup as a form of (parentheses) and use it
+the same way: immediately before and after the text being marked
+up.  Inline markup by itself (surrounded by whitespace) or in the
+middle of a word won't be recognized.  See the <a class="reference external" href="https://docutils.sourceforge.io/docs/ref/rst/restructuredtext.html#inline-markup">markup spec</a> for
+full details.</p>
+</div>
+</section>
+<section id="lists">
+<h1><a class="toc-backref" href="#id18">Lists</a></h1>
+<p>Lists of items come in three main flavours: <strong>enumerated</strong>,
+<strong>bulleted</strong> and <strong>definitions</strong>.  In all list cases, you may have as
+many paragraphs, sublists, etc. as you want, as long as the left-hand
+side of the paragraph or whatever aligns with the first line of text
+in the list item.</p>
+<p>Lists must always start a new paragraph -- that is, they must appear
+after a blank line.</p>
+<dl>
+<dt><strong>enumerated</strong> lists (numbers, letters or roman numerals; <a class="reference external" href="../quickref/#enumerated-lists">quickref</a>)</dt>
+<dd><p>Start a line off with a number or letter followed by a period &quot;.&quot;,
+right bracket &quot;)&quot; or surrounded by brackets &quot;( )&quot; -- whatever you're
+comfortable with.  All of the following forms are recognised:</p>
+<pre class="literal-block">1. numbers
+
+A. upper-case letters
+   and it goes over many lines
+
+   with two paragraphs and all!
+
+a. lower-case letters
+
+   3. with a sub-list starting at a different number
+   4. make sure the numbers are in the correct sequence though!
+
+I. upper-case roman numerals
+
+i. lower-case roman numerals
+
+(1) numbers again
+
+1) and again</pre>
+<p>Results in (note: the different enumerated list styles are not
+always supported by every web browser, so you may not get the full
+effect here):</p>
+<ol class="arabic simple">
+<li><p>numbers</p></li>
+</ol>
+<ol class="upperalpha">
+<li><p>upper-case letters
+and it goes over many lines</p>
+<p>with two paragraphs and all!</p>
+</li>
+</ol>
+<ol class="loweralpha simple">
+<li><p>lower-case letters</p>
+<ol class="arabic simple" start="3">
+<li><p>with a sub-list starting at a different number</p></li>
+<li><p>make sure the numbers are in the correct sequence though!</p></li>
+</ol>
+</li>
+</ol>
+<ol class="upperroman simple">
+<li><p>upper-case roman numerals</p></li>
+</ol>
+<ol class="lowerroman simple">
+<li><p>lower-case roman numerals</p></li>
+</ol>
+<ol class="arabic simple">
+<li><p>numbers again</p></li>
+</ol>
+<ol class="arabic simple">
+<li><p>and again</p></li>
+</ol>
+</dd>
+<dt><strong>bulleted</strong> lists (<a class="reference external" href="../quickref/#bullet-lists">quickref</a>)</dt>
+<dd><p>Just like enumerated lists, start the line off with a bullet point
+character - either &quot;-&quot;, &quot;+&quot; or &quot;*&quot;:</p>
+<pre class="literal-block">* a bullet point using &quot;*&quot;
+
+  - a sub-list using &quot;-&quot;
+
+    + yet another sub-list
+
+  - another item</pre>
+<p>Results in:</p>
+<ul class="simple">
+<li><p>a bullet point using &quot;*&quot;</p>
+<ul>
+<li><p>a sub-list using &quot;-&quot;</p>
+<ul>
+<li><p>yet another sub-list</p></li>
+</ul>
+</li>
+<li><p>another item</p></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt><strong>definition</strong> lists (<a class="reference external" href="../quickref/#definition-lists">quickref</a>)</dt>
+<dd><p>Unlike the other two, the definition lists consist of a term, and
+the definition of that term.  The format of a definition list is:</p>
+<pre class="literal-block">what
+  Definition lists associate a term with a definition.
+
+*how*
+  The term is a one-line phrase, and the definition is one or more
+  paragraphs or body elements, indented relative to the term.
+  Blank lines are not allowed between term and definition.</pre>
+<p>Results in:</p>
+<dl class="simple">
+<dt>what</dt>
+<dd><p>Definition lists associate a term with a definition.</p>
+</dd>
+<dt><em>how</em></dt>
+<dd><p>The term is a one-line phrase, and the definition is one or more
+paragraphs or body elements, indented relative to the term.
+Blank lines are not allowed between term and definition.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+<section id="preformatting-code-samples">
+<h1><a class="toc-backref" href="#id19">Preformatting (code samples)</a></h1>
+<p>(<a class="reference external" href="../quickref/#literal-blocks">quickref</a>)</p>
+<p>To just include a chunk of preformatted, never-to-be-fiddled-with
+text, finish the prior paragraph with &quot;<code class="docutils literal">::</code>&quot;.  The preformatted
+block is finished when the text falls back to the same indentation
+level as a paragraph prior to the preformatted block.  For example:</p>
+<pre class="literal-block">An example::
+
+    Whitespace, newlines, blank lines, and all kinds of markup
+      (like *this* or \this) is preserved by literal blocks.
+  Lookie here, I've dropped an indentation level
+  (but not far enough)
+
+no more example</pre>
+<p>Results in:</p>
+<blockquote>
+<p>An example:</p>
+<pre class="literal-block">  Whitespace, newlines, blank lines, and all kinds of markup
+    (like *this* or \this) is preserved by literal blocks.
+Lookie here, I've dropped an indentation level
+(but not far enough)</pre>
+<p>no more example</p>
+</blockquote>
+<p>Note that if a paragraph consists only of &quot;<code class="docutils literal">::</code>&quot;, then it's removed
+from the output:</p>
+<pre class="literal-block">::
+
+    This is preformatted text, and the
+    last &quot;::&quot; paragraph is removed</pre>
+<p>Results in:</p>
+<pre class="literal-block">This is preformatted text, and the
+last &quot;::&quot; paragraph is removed</pre>
+</section>
+<section id="sections">
+<h1><a class="toc-backref" href="#id20">Sections</a></h1>
+<p>(<a class="reference external" href="../quickref/#section-structure">quickref</a>)</p>
+<p>To break longer text up into sections, you use <strong>section headers</strong>.
+These are a single line of text (one or more words) with adornment: an
+underline alone, or an underline and an overline together, in dashes
+&quot;<code class="docutils literal"><span class="pre">-----</span></code>&quot;, equals &quot;<code class="docutils literal"><span class="pre">======</span></code>&quot;, tildes &quot;<code class="docutils literal"><span class="pre">~~~~~~</span></code>&quot; or any of the
+non-alphanumeric characters <code class="docutils literal">= - ` : ' &quot; ~ ^ _ * + # &lt; &gt;</code> that you
+feel comfortable with.  An underline-only adornment is distinct from
+an overline-and-underline adornment using the same character.  The
+underline/overline must be at least as long as the title text.  Be
+consistent, since all sections marked with the same adornment style
+are deemed to be at the same level:</p>
+<pre class="literal-block">Chapter 1 Title
+===============
+
+Section 1.1 Title
+-----------------
+
+Subsection 1.1.1 Title
+~~~~~~~~~~~~~~~~~~~~~~
+
+Section 1.2 Title
+-----------------
+
+Chapter 2 Title
+===============</pre>
+<p>This results in the following structure, illustrated by simplified
+pseudo-XML:</p>
+<pre class="literal-block">&lt;section&gt;
+    &lt;title&gt;
+        Chapter 1 Title
+    &lt;section&gt;
+        &lt;title&gt;
+            Section 1.1 Title
+        &lt;section&gt;
+            &lt;title&gt;
+                Subsection 1.1.1 Title
+    &lt;section&gt;
+        &lt;title&gt;
+            Section 1.2 Title
+&lt;section&gt;
+    &lt;title&gt;
+        Chapter 2 Title</pre>
+<p>(Pseudo-XML uses indentation for nesting and has no end-tags.  It's
+not possible to show actual processed output, as in the other
+examples, because sections cannot exist inside block quotes.  For a
+concrete example, compare the section structure of this document's
+source text and processed output.)</p>
+<p>Note that section headers are available as link targets, just using
+their name.  To link to the <a class="reference internal" href="#lists">Lists</a> heading, I write &quot;<code class="docutils literal">Lists_</code>&quot;.  If
+the heading has a space in it like <a class="reference internal" href="#text-styles">text styles</a>, we need to quote
+the heading &quot;<code class="docutils literal">`text styles`_</code>&quot;.</p>
+<section id="document-title-subtitle">
+<h2><a class="toc-backref" href="#id21">Document Title / Subtitle</a></h2>
+<p>The title of the whole document is distinct from section titles and
+may be formatted somewhat differently (e.g. the HTML writer by default
+shows it as a centered heading).</p>
+<p>To indicate the document title in reStructuredText, use a unique adornment
+style at the beginning of the document.  To indicate the document subtitle,
+use another unique adornment style immediately after the document title.  For
+example:</p>
+<pre class="literal-block">================
+ Document Title
+================
+----------
+ Subtitle
+----------
+
+Section Title
+=============
+
+...</pre>
+<p>Note that &quot;Document Title&quot; and &quot;Section Title&quot; above both use equals
+signs, but are distinct and unrelated styles.  The text of
+overline-and-underlined titles (but not underlined-only) may be inset
+for aesthetics.</p>
+</section>
+</section>
+<section id="images">
+<h1><a class="toc-backref" href="#id22">Images</a></h1>
+<p>(<a class="reference external" href="../quickref/#directives">quickref</a>)</p>
+<p>To include an image in your document, you use the <code class="docutils literal">image</code> <a class="reference external" href="https://docutils.sourceforge.io/docs/ref/rst/directives.html">directive</a>.
+For example:</p>
+<pre class="literal-block">.. image:: /images/nikola.png</pre>
+<p>results in:</p>
+<img alt="/images/nikola.png" src="/images/nikola.png" />
+<p>The <code class="docutils literal">/images/nikola.png</code> part indicates the filename of the image
+you wish to appear in the document. There's no restriction placed on
+the image (format, size etc).  If the image is to appear in HTML and
+you wish to supply additional information, you may:</p>
+<pre class="literal-block">.. image:: /images/nikola.png
+   :height: 100
+   :width: 200
+   :scale: 50
+   :alt: alternate text</pre>
+<p>See the full <a class="reference external" href="https://docutils.sourceforge.io/docs/ref/rst/directives.html#images">image directive documentation</a> for more info.</p>
+</section>
+<section id="what-next">
+<h1><a class="toc-backref" href="#id23">What Next?</a></h1>
+<p>This primer introduces the most common features of reStructuredText,
+but there are a lot more to explore.  The <a class="reference external" href="../quickref/">Quick reStructuredText</a>
+user reference is a good place to go next.  For complete details, the
+<a class="reference external" href="https://docutils.sourceforge.io/docs/ref/rst/restructuredtext.html">reStructuredText Markup Specification</a> is the place to go <a class="footnote-reference brackets" href="#id15" id="id14">1</a>.</p>
+<p>Users who have questions or need assistance with Docutils or
+reStructuredText should post a message to the <a class="reference external" href="https://docutils.sourceforge.io/docs/user/mailing-lists.html#docutils-users">Docutils-users</a> mailing
+list.</p>
+<dl class="footnote brackets">
+<dt class="label" id="id15"><span class="brackets"><a class="fn-backref" href="#id14">1</a></span></dt>
+<dd><p>If that relative link doesn't work, try the master document:
+<a class="reference external" href="https://docutils.sourceforge.io/docs/ref/rst/restructuredtext.html">https://docutils.sourceforge.io/docs/ref/rst/restructuredtext.html</a>.</p>
+</dd>
+</dl>
+</section>
