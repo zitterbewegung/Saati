@@ -7,7 +7,6 @@ from transformers import (
     BlenderbotForConditionalGeneration,
     Conversation,
 )
-from transformers import RobertaTokenizer, IBertModel
 import torch
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 from transformers import pipeline, Conversation
@@ -29,8 +28,8 @@ def blenderbot400M(utterance: str) -> List[str]:
     return responses
 
 def questions(question: str, text: str) -> List[str]:
-    tokenizer = RobertaTokenizer.from_pretrained('ibert-roberta-base')
-    model = IBertForQuestionAnswering.from_pretrained('ibert-roberta-base')
+    tokenizer = AutoTokenizer.from_pretrained('ibert-roberta-base')
+    model = AutoTokenizer.from_pretrained('ibert-roberta-base')
 
     question, text = "Who was Jim Henson?", "Jim Henson was a nice puppet"
     inputs = tokenizer(question, text, return_tensors='pt')
@@ -79,6 +78,19 @@ def blenderbot3B(utterance: str):
     tokenizer = AutoTokenizer.from_pretrained("facebook/blenderbot-3B")
 
     model = AutoModelForSeq2SeqLM.from_pretrained("facebook/blenderbot-3B")
+    inputs = tokenizer([utterance], return_tensors="pt")
+    reply_ids = model.generate(**inputs)
+    responses = [
+        tokenizer.decode(g, skip_special_tokens=True, clean_up_tokenization_spaces=True)
+        for g in reply_ids
+    ]
+    return responses
+
+def blenderbot1B(utterance: str):
+    
+    tokenizer = AutoTokenizer.from_pretrained("facebook/blenderbot-1B-distill")
+
+    model = AutoModelForSeq2SeqLM.from_pretrained("facebook/blenderbot-1B-distill")
     inputs = tokenizer([utterance], return_tensors="pt")
     reply_ids = model.generate(**inputs)
     responses = [
