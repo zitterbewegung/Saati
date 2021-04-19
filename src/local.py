@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import os
 import sys
 import datetime
@@ -15,39 +16,30 @@ import csv
 from transformers import pipeline
 from transformers import BlenderbotSmallTokenizer, BlenderbotForConditionalGeneration
 from transformers import AutoModelForSequenceClassification
+=======
+#!/usr/bin/env python3
+import torch
+import numpy as np
+from scipy.io.wavfile import write
+>>>>>>> f6d22a488d1d81039773090d0ba562d1bb7776a7
 from transformers import (
     AutoTokenizer,
-    AutoModelForCausalLM,
-    AutoModel,
-    AutoModelForSequenceClassification,
+    pipeline,
+    BlenderbotTokenizer,
+    BlenderbotForConditionalGeneration,
+    Conversation,
+    TFAutoModelWithLMHead
 )
-
-from transformers import (TFAutoModelWithLMHead, 
-                         AutoTokenizer, 
-                         pipeline, 
-                         BlenderbotSmallTokenizer, 
-                         BlenderbotForConditionalGeneration, 
-                         Conversation)
 from transformers import BlenderbotSmallTokenizer, BlenderbotForConditionalGeneration
 from transformers import pipeline
-import random
+import uuid, json, pickle
+from typing import List, Any
 
-
-from transformers import LongformerModel, LongformerTokenizer
-from transformers import ReformerModelWithLMHead
-from transformers import LongformerTokenizer, LongformerForQuestionAnswering
-
-from transitions.extensions import HierarchicalGraphMachine as Machine
-import torch
-import pandas
-from dataclasses import dataclass
-import rpa as r
-
-from typing import List, Optional
 from pydantic import BaseModel
-import uuid
 from datetime import datetime
+from typing import List, Optional
 
+<<<<<<< HEAD
 local_microphone = True
 local_speaker = True
 
@@ -75,224 +67,337 @@ class Query(BaseModel):
 engine = pyttsx3.init()
 
 # client = wolframalpha.Client('Get your own key')
+=======
+>>>>>>> f6d22a488d1d81039773090d0ba562d1bb7776a7
 
-# voices = engine.getProperty('voices')
-# engine.setProperty('voice', voices[len(voices) - 1].id)
+#!pip install streamlit
+#!pip install transitions[diagrams]
+#!pip install graphviz pygraphviz
+#!brew install graphviz
+# from transitions.extensions import GraphMachine as Machine
+from transitions import Machine
 
+import random
+from datetime import datetime
 
-def talk(audio):
-    print("Saati: " + audio)
-    engine.say(audio)
-    engine.runAndWait()
+# Set up logging; The basic log level will be DEBUG
+import logging
+import speech_recognition as sr
+import torch
+import numpy as np
 
+import streamlit as st
 
-def greetMe():
-    CurrentHour = int(datetime.now().hour)
-    if CurrentHour >= 0 and CurrentHour < 12:
-        talk("Good Morning!")
+logging.basicConfig(level=logging.INFO)
 
-    elif CurrentHour >= 12 and CurrentHour < 18:
-        talk("Good Afternoon!")
-
-    elif CurrentHour >= 18 and CurrentHour != 0:
-        talk("Good Evening!")
-
-
-greetMe()
-
-
-# model_name = "774M"
-# sess = gpt2.start_tf_sess()
-
-talk("Wait a sec got to get ready!")
-
-# gpt2.load_gpt2(sess, model_name=model_name)
-
-talk("Hey, it is Saati!")
+# engine = pyttsx3.init("nsss")
 
 
-def journal_sleep(response: str):
-    CurrentHour = int(datetime.now().hour)
-    if CurrentHour >= 0 and CurrentHour < 9:
-        talk(" How well did you sleep ? ")
-    elif CurrentHour >= 10 and CurrentHour <= 12:
-        talk(" Did you sleep in? ")
-    return response
+class Saati(object):
+    def __init__(self, name, debugMode=False):
+        # No anonymous superheroes on my watch! Every narcoleptic superhero gets
+        # a name. Any name at all. SleepyMan. SlumberGirl. You get the idea.
+        self.name = name
+
+        # How do we feel about the person.
+        self.sentiment = 1
+
+        # Interaction_number
+        self.interaction_number = 0
+
+        # Figure out outcome that would put you in the friendzone?
+        # self.love_vector = self.impression_points * random.randrange(20) / self.interaction_number
+
+        # Initialize the state machine
+
+        # states represent where you are.
+        states = [
+            "initializemodels",
+            "meetup",
+            "hangingout",
+            "sleeping",
+            "wake_up",
+            "leave",
+        ]
+        self.machine = Machine(model=self, states=states, initial="initializemodels")
+        self.machine.add_ordered_transitions()
+        self.machine.add_transition(trigger="friendzone", source="*", dest=None)
+        # Initialize models
 
 
-# Scoring input as negative / positive
+def GivenCommand(test_mode=True):
+    Input = ""
+    if test_mode:
+        Input = input("Resp>>")
+        return Input
+    else:
+        k = sr.Recognizer()
+        with sr.Microphone() as source:
+            print("Listening...")
+            k.pause_threshold = 1
+            audio = k.listen(source)
+        try:
+            Input = k.recognize_google(audio, language="en-us")
+            talk("You: " + Input + "\n")
+        except sr.UnknownValueError:
+            talk("Gomen! I didn't get that! Try typing it here!")
+            Input = str(input("Command: "))
+    return Input
 
 
-def film_scripts():
+def smalltalk(utterance: str) -> List[str]:
 
-    """
-    tokenizer = AutoTokenizer.from_pretrained("cpierse/gpt2_film_scripts")
-    model = AutoModelWithLMHead.from_pretrained("cpierse/gpt2_film_scripts")
-    # making sure dropout is turned off
-    model.eval()
-    max_length = 1000
-    num_samples = 3
-
-    output = model.generate(
-            bos_token_id=random.randint(1,50000),
-            do_sample=True,
-            top_k=50,
-            max_length = max_length,
-            top_p=0.95,
-            num_return_sequences=num_samples)
-
-    decoded_output = []
-    for sample in output:
-            decoded_output.append(tokenizer.decode(
-                    sample, skip_special_tokens=True))
-            print(decoded_output[0])
-    """
-    pass
-
-
-def compute_sentiment(utterance: str) -> dict:
-
-    nlp = pipeline("sentiment-analysis")
-    score = nlp(utterance)[0]
-    # talk("The score was {}".format(score))
-    return score
-
-
-def guess_upvote_score(ctx: str):
-    """
-    Add a reddit / tweet composer and it will guess upvote score?
-    """
-    model_card = "microsoft/DialogRPT-updown"  # you can try other model_card listed in the table above
-    tokenizer = AutoTokenizer.from_pretrained(model_card)
-    model = AutoModelForSequenceClassification.from_pretrained(model_card)
-
-    def __score(cxt, hyp):
-        model_input = tokenizer.encode(cxt + "<|endoftext|>" + hyp, return_tensors="pt")
-        result = model(model_input, return_dict=True)
-        return torch.sigmoid(result.logits)
-
-    return __score(ctx, response)
-
-
-# def get_session_context(query: Optional) -> str:
-context = """ My name is satti. I have no idea of my purpose. I am programmed in python. I am release under the apache software licence.
-	      """  # TODO make this a redis query.
-
-
-def reinforcer(utterance: str, reward: float) -> any:
-    # initialize trainer
-    ppo_config = {"batch_size": 1, "forward_batch_size": 1}
-    ppo_trainer = PPOTrainer(gpt2_model, gpt2_model_ref, **ppo_config)
-
-    # encode a query
-    query_txt = utterance
-    query_tensor = gpt2_tokenizer.encode(query_txt, return_tensors="pt")
-
-    # get model response
-    response_tensor = respond_to_batch(gpt2_model, query_tensor)
-    response_txt = gpt2_tokenizer.decode(response_tensor[0, :])
-
-    # define a reward for response
-    # (this could be any reward such as human feedback or output from another model)
-    reward = torch.tensor([reward])
-
-    # train model with ppo
-    train_stats = ppo_trainer.step(query_tensor, response_tensor, reward)
-
-    return train_stats
-
-
-def answer_question(query: str, context: str):
-    """
-    {'score': 0.5135612454720828, 'start': 35, 'end': 59, 'answer': 'huggingface/transformers'}
-    """
-
-    question_answerer = pipeline("question-answering")
-    answer_to_question = question_answerer({"question": query, "context": context})
-    talk(answer_to_question.get("answer", "I dont know"))
-    return (query, answer_to_question["answer"])
-
-
-## Start reformer
-# Use for language generation from large amounts of information like books.
-# Encoding
-def encode(list_of_strings, pad_token_id=0):
-    max_length = max([len(string) for string in list_of_strings])
-
-    # create emtpy tensors
-    attention_masks = torch.zeros((len(list_of_strings), max_length), dtype=torch.long)
-    input_ids = torch.full(
-        (len(list_of_strings), max_length), pad_token_id, dtype=torch.long
-    )
-
-    for idx, string in enumerate(list_of_strings):
-        # make sure string is in byte format
-        if not isinstance(string, bytes):
-            string = str.encode(string)
-
-        input_ids[idx, : len(string)] = torch.tensor([x + 2 for x in string])
-        attention_masks[idx, : len(string)] = 1
-
-    return input_ids, attention_masks
-
-
-# Decoding
-def decode(outputs_ids):
-    decoded_outputs = []
-    for output_ids in outputs_ids.tolist():
-        # transform id back to char IDs < 2 are simply transformed to ""
-        decoded_outputs.append(
-            "".join([chr(x - 2) if x > 1 else "" for x in output_ids])
-        )
-    return decoded_outputs
-
-
-def reformer(question: str):
-    model = ReformerModelWithLMHead.from_pretrained("google/reformer-enwik8")
-    encoded, attention_masks = encode(
-        ["In 1965, Brooks left IBM to found the Department of"]
-    )
-    decoded = decode(model.generate(encoded, do_sample=True, max_length=300))
-    talk(decoded)
-    return decoded
-
-
-##End Reformer
-
-
-# summarizer = pipeline('summarization')
-# summary = summarizer(JMC_TEXT_TO_SUMMARIZE)
-
-##########################################################################
-# def questions(input_text: str):                                        #
-#     model_name = "uncased_L-12_H-768_A-12"                             #
-#     model_dir = bert.fetch_google_bert_model(model_name, ".models")    #
-#     model_ckpt = os.path.join(model_dir, "bert_model.ckpt")            #
-#                                                                        #
-#     bert_params = bert.params_from_pretrained_ckpt(model_dir)          #
-#     l_bert = bert.BertModelLayer.from_params(bert_params, name="bert") #
-##########################################################################
-
-# use in Keras Model here, and call model.build()
-
-# bert.load_bert_weights(l_bert, model_ckpt)      # should be called after model.build()
-
-
-def smalltalk(UTTERANCE: str):
-    mname = "facebook/blenderbot-90M"
+    device = "cuda:0" if torch.cuda.is_available() else "cpu"
+    logging.info("starting smalltalk")
+    mname = "facebook/blenderbot-3B"
     model = BlenderbotForConditionalGeneration.from_pretrained(mname)
-    tokenizer = BlenderbotSmallTokenizer.from_pretrained(mname)
-    # UTTERANCE = "My friends are cool but they eat too many carbs."
-    inputs = tokenizer([UTTERANCE], return_tensors="pt")
+    model.to(device)
+    tokenizer = BlenderbotTokenizer.from_pretrained(mname)
+    inputs = tokenizer([utterance], return_tensors="pt").to(device)
     reply_ids = model.generate(**inputs)
     responses = [
         tokenizer.decode(g, skip_special_tokens=True, clean_up_tokenization_spaces=True)
         for g in reply_ids
     ]
-    # logger.debug(responses)
-    talk(responses[0])
     return responses
 
+
+def is_a_question(utterance: str) -> bool:
+    START_WORDS = [
+        "who",
+        "what",
+        "when",
+        "where",
+        "why",
+        "how",
+        "is",
+        "can",
+        "does",
+        "do",
+    ]
+    for word in START_WORDS:
+        if word in START_WORDS:
+            return True
+    return false
+
+
+def talk(text: str):
+    logging.info("starting waveglow")
+    device_to_use = "cuda" if torch.cuda.is_available() else "cpu"
+    if device_to_use:
+        logging.info("Saati: " + text)
+
+        engine.say(text)
+        engine.runAndWait()
+    else:
+
+        waveglow = torch.hub.load(
+            "nvidia/DeepLearningExamples:torchhub", "nvidia_waveglow"
+        )
+        waveglow = waveglow.remove_weightnorm(waveglow)
+        waveglow = waveglow.to(device_to_use)
+        waveglow.eval()
+        tacotron2 = torch.hub.load(
+            "nvidia/DeepLearningExamples:torchhub", "nvidia_tacotron2"
+        )
+        tacotron2 = tacotron2.to(device_to_use)
+        tacotron2.eval()
+        # preprocessing
+        sequence = np.array(tacotron2.text_to_sequence(text, ["english_cleaners"]))[
+            None, :
+        ]
+        sequence = torch.from_numpy(sequence).to(
+            device=device_to_use, dtype=torch.int64
+        )
+
+        # run the models
+        with torch.no_grad():
+            _, mel, _, _ = tacotron2.infer(sequence)
+            audio = waveglow.infer(mel)
+            audio_numpy = audio[0].data.cpu().numpy()
+            rate = 22050
+
+            write("/tmp/audio.wav", rate, audio_numpy)
+            with open("/tmp/audio.wav", "rb") as f:
+                b = f.read()
+                play_obj = sa.play_buffer(b, 2, 2, 22050)
+
+                play_obj.wait_done()
+
+    # return audio
+
+
+def GivenCommand(test_mode=False):
+    Input = ""
+    if test_mode:
+        Input = input("Resp>>")
+    else:
+        k = sr.Recognizer()
+        with sr.Microphone() as source:
+            print("Listening...")
+            k.pause_threshold = 1
+            audio = k.listen(source)
+        try:
+            Input = k.recognize_google(audio, language="en-us")
+            print("You: " + Input + "\n")
+        except sr.UnknownValueError:
+            talk("Gomen! I didn't get that! Try typing it here!")
+            Input = str(input("Command: "))
+    return Input
+
+
+class Event(BaseModel):
+    uuid: str = uuid.uuid4()
+    timestamp: datetime = datetime.now()
+    responses: List[str] = []
+    sentiment: int = 1
+    interactions: int = 1
+    sync_ratio: float = 1
+    state_machine: Any
+
+
+# function to add to JSON
+def write_json(data, filename="event_log.json"):
+    with open(filename, "a+") as f:
+        json.dump(data, f, indent=4)
+        f.write("\n")
+
+
+def compute_sentiment(utterance: str) -> float:
+    nlp = pipeline("sentiment-analysis")
+    result = nlp(utterance)
+    score = result[0]["score"]
+    if result[0]["label"] == "NEGATIVE":
+        score = score * -1
+
+    logging.info("The score was {}".format(score))
+    return score
+
+
+def local_ingest():
+    """
+    If pos or neg pos 5 to 1 relationship doesn't continue
+    If exceeds 11 pos 1 neg no challenge
+    you wlant not bliss but
+    """
+
+    instance = Saati(uuid.uuid4())
+
+    user_input = GivenCommand()
+
+    from pathlib import Path
+    import pickle
+
+    my_file = Path("event_log.json")
+    state_machine = pickle.dumps(instance)
+    current_state = Event()
+
+    if my_file.is_file():
+        with open("event_log.json", "r") as f:
+            data = f.read()
+            save_state = json.loads(data)
+    write_json(current_state.json())
+    # if my_file.is_file():
+    #    current_state = pickle.loads(my_file)
+    # else:
+    #    current_state = pickle.dumps(current_state)
+
+    while True:
+        # instance.get_graph().draw('my_state_diagram.png', prog='dot')
+
+        logging.info("Computing reply")
+        responce = smalltalk(user_input)[0]
+        talk(responce)
+        current_state.responses.append(responce)
+        current_state.sentiment = current_state.sentiment + compute_sentiment(
+            user_input
+        )
+        current_state.interactions = current_state.interactions + 1
+        current_state.sync_ratio = current_state.sentiment / current_state.interactions
+        logging.info(
+            "Responses: {} Sentiment: {}  Sync ratio: {} Interactions: {}	| Current State {}".format(
+                str(current_state.responses),
+                str(current_state.sentiment),
+                str(current_state.sync_ratio),
+                str(current_state.interactions),
+                str(current_state.state_machine),
+            )
+        )
+
+        if 5 <= current_state.sync_ratio <= 11:
+            instance.next_state()
+        else:
+            print("Hey, lets stay friends")
+            instance.friendzone()
+            return
+    # current_state.state_machine = pickle.dumps(instance)
+
+def answer_question(body):
+    instance = Saati(uuid.uuid4())
+
+    sentiment = 1
+
+    interactions = 1
+    sync_ratio = sentiment / interactions
+
+    logging.info("Computing reply")
+    responce = ["Hello"]  # smallertalk(body)  # [0]
+    # resp = MessagingResponse()
+    current_state = Event(
+        input=body,
+        output=responce,
+        sentiment=sentiment,
+        sync_ratio=sync_ratio,
+        interactions=interactions,
+        state_machine=instance,
+    )
+
+    from pathlib import Path
+
+    my_file = Path("event_log.dat")
+    if my_file.is_file():
+        save_state = pickle.load(open("event_log.dat", "rb"))
+        pickled_state_machine = save_state.get("state_machine")
+        state_machine = pickle.loads(pickled_state_machine)
+        interactions = current_state.interactions
+        print(interactions)
+
+    sentiment = sentiment + compute_sentiment(body)
+    interactions = interactions + 1
+
+    logging.info(
+        "Responses: {} Sentiment: {}  Sync ratio: {} Interactions: {}	| Current State {}".format(
+            str(responce),
+            str(sentiment),
+            str(sync_ratio),
+            str(interactions),
+            str(instance.state),
+        )
+    )
+    dump = pickle.dumps(instance)
+
+    save_state = {"state_machine": dump, "current_state": current_state.dict()}
+
+    with open("event_log.dat", "wb") as file:
+        data = pickle.dumps(save_state)
+        file.write(data)
+
+    # with open("save_state.json", "r+") as file:
+    # 	 data = json.load(file)
+    # 	 data.update(save_state)
+    # 	 file.seek(0)
+    # 	 json.dump(data, file)
+
+    # my_dict = {'1': 'aaa', '2': 'bbb', '3': 'ccc'}
+
+    if 5 >= sync_ratio <= 11 or interactions < 10:
+        instance.next_state()
+    else:
+        instance.friendzone()
+
+    return responce
+
+<<<<<<< HEAD
 def smalltalk_memory(UTTERANCE: str):
 	from transformers import AutoModelForCausalLM, AutoTokenizer
 	import torch
@@ -476,6 +581,8 @@ def GivenCommand():
 
 	
 	return Input
+=======
+>>>>>>> f6d22a488d1d81039773090d0ba562d1bb7776a7
 
 
 if __name__ == '__main__':
@@ -545,12 +652,11 @@ if __name__ == '__main__':
 		elif 'smalltalk' or 'what do you think'  in Input:
 			output = smalltalk(Input)
 			recipient = GivenCommand()
-			sentiment = compute_sentiment(Input)
+                        
+                        #sentiment = compute_sentiment(Input)
+                        
 
-			fields=[datetime.utcnow() , Input, output, sentiment]
-			with open(r'datasette_log', 'a') as f:
-				writer = csv.writer(f)
-				writer.writerow(fields)
+
 		elif 'explain' in Input:
 			logger.debug("longformer is being used")
 			explanation = longformer(Input)
@@ -589,5 +695,4 @@ if __name__ == '__main__':
 					webbrowser.open('https://www.google.co.in/search?q=' + Input)
 		
 			talk("Sorry I can't provide a good response")
-		
-		#talk('Next Command! Please!')
+
