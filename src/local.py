@@ -1,7 +1,7 @@
 import os
 import sys
 import datetime
-#import pyttsx3
+import pyttsx3
 import speech_recognition as sr
 
 # import wikipedia
@@ -71,8 +71,8 @@ class Query(BaseModel):
     sentiment: str
     score: float
 
-
-engine = pyttsx3.init("nsss")
+#if 'Windows' == platform.system():
+engine = pyttsx3.init()
 
 # client = wolframalpha.Client('Get your own key')
 
@@ -460,8 +460,6 @@ def voice_ingest(model, scorer, sample_rate=16000, vad_aggressiveness=3):
 
 
 def GivenCommand():
-<<<<<<< HEAD
-	
 	k = sr.Recognizer()
 	with sr.Microphone() as source:
 		print("Listening...")
