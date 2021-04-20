@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import os
 import sys
 import datetime
@@ -16,12 +15,6 @@ import csv
 from transformers import pipeline
 from transformers import BlenderbotSmallTokenizer, BlenderbotForConditionalGeneration
 from transformers import AutoModelForSequenceClassification
-=======
-#!/usr/bin/env python3
-import torch
-import numpy as np
-from scipy.io.wavfile import write
->>>>>>> f6d22a488d1d81039773090d0ba562d1bb7776a7
 from transformers import (
     AutoTokenizer,
     pipeline,
@@ -39,7 +32,6 @@ from pydantic import BaseModel
 from datetime import datetime
 from typing import List, Optional
 
-<<<<<<< HEAD
 local_microphone = True
 local_speaker = True
 
@@ -67,8 +59,6 @@ class Query(BaseModel):
 engine = pyttsx3.init()
 
 # client = wolframalpha.Client('Get your own key')
-=======
->>>>>>> f6d22a488d1d81039773090d0ba562d1bb7776a7
 
 #!pip install streamlit
 #!pip install transitions[diagrams]
@@ -397,7 +387,6 @@ def answer_question(body):
 
     return responce
 
-<<<<<<< HEAD
 def smalltalk_memory(UTTERANCE: str):
 	from transformers import AutoModelForCausalLM, AutoTokenizer
 	import torch
@@ -504,7 +493,7 @@ def poems(input_text: str):  # run_name='/Users/r2q2/Projects/waifu2020/src/mode
 ########################################################################
 
 
-def voice_ingest(model, scorer, sample_rate=16000, vad_aggressiveness=3):
+""" def voice_ingest(model, scorer, sample_rate=16000, vad_aggressiveness=3):
     # Load DeepSpeech model
     if os.path.isdir(ARGS.model):
         model_dir = ARGS.model
@@ -561,7 +550,7 @@ def voice_ingest(model, scorer, sample_rate=16000, vad_aggressiveness=3):
                 from pyautogui import typewrite
 
                 typewrite(text)
-            stream_context = model.createStream()
+            stream_context = model.createStream() """
 
 
 def GivenCommand():
@@ -581,8 +570,6 @@ def GivenCommand():
 
 	
 	return Input
-=======
->>>>>>> f6d22a488d1d81039773090d0ba562d1bb7776a7
 
 
 if __name__ == '__main__':
@@ -650,10 +637,10 @@ if __name__ == '__main__':
 
 
 		elif 'smalltalk' or 'what do you think'  in Input:
-			output = smalltalk(Input)
-			recipient = GivenCommand()
-                        
-                        #sentiment = compute_sentiment(Input)
+			#user_identifier = str(request.remote_addr)
+            inference = answer_question(Input, user_identifier, 'local')
+            #output = smalltalk(Input)
+			#recipient = GivenCommand()
                         
 
 
