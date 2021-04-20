@@ -1,7 +1,27 @@
+<<<<<<< HEAD
+import os
+import sys
+import datetime
+import pyttsx3
+import speech_recognition as sr
+
+# import wikipedia
+# import wolframalpha
+import webbrowser
+import smtplib
+import random
+
+# import gpt_2_simple as gpt2
+import csv
+from transformers import pipeline
+from transformers import BlenderbotSmallTokenizer, BlenderbotForConditionalGeneration
+from transformers import AutoModelForSequenceClassification
+=======
 #!/usr/bin/env python3
 import torch
 import numpy as np
 from scipy.io.wavfile import write
+>>>>>>> f6d22a488d1d81039773090d0ba562d1bb7776a7
 from transformers import (
     AutoTokenizer,
     #pipeline,
@@ -19,6 +39,36 @@ from pydantic import BaseModel
 from datetime import datetime
 from typing import List, Optional
 
+<<<<<<< HEAD
+local_microphone = True
+local_speaker = True
+
+
+def can_you_type_that_out(query: str):
+    r.init(visual_automation=True, chrome_browser=False)
+    r.keyboard("[cmd][space]")
+    r.keyboard("safari[enter]")
+    r.keyboard("[cmd]t")
+    r.keyboard("joker[enter]")
+    r.wait(2.5)
+    r.snap("page.png", "results.png")
+    r.close()
+
+
+class Query(BaseModel):
+    uuid: str = uuid.uuid4()
+    utterance_ts: datetime
+    input: str
+    output: str
+    sentiment: str
+    score: float
+
+#if 'Windows' == platform.system():
+engine = pyttsx3.init()
+
+# client = wolframalpha.Client('Get your own key')
+=======
+>>>>>>> f6d22a488d1d81039773090d0ba562d1bb7776a7
 
 #!pip install streamlit
 #!pip install transitions[diagrams]
@@ -332,6 +382,192 @@ def answer_question(body):
 
     return responce
 
+<<<<<<< HEAD
+def smalltalk_memory(UTTERANCE: str):
+	from transformers import AutoModelForCausalLM, AutoTokenizer
+	import torch
+
+	tokenizer = AutoTokenizer.from_pretrained("microsoft/DialoGPT-large")
+	model = AutoModelForCausalLM.from_pretrained("microsoft/DialoGPT-large")
+
+	# Let's chat for 5 lines
+	for step in range(5):
+		# encode the new user input, add the eos_token and return a tensor in Pytorch
+		new_user_input_ids = tokenizer.encode(input(">> User:") + tokenizer.eos_token, return_tensors='pt')
+
+		# append the new user input tokens to the chat history
+		bot_input_ids = torch.cat([chat_history_ids, new_user_input_ids], dim=-1) if step > 0 else new_user_input_ids
+
+		# generated a response while limiting the total chat history to 1000 tokens, 
+		chat_history_ids = model.generate(bot_input_ids, max_length=100, pad_token_id=tokenizer.eos_token_id) #Changing to 100 for tweets.
+
+		# pretty print last ouput tokens from bot
+		print("DialoGPT: {}".format(tokenizer.decode(chat_history_ids[:, bot_input_ids.shape[-1]:][0], skip_special_tokens=True)))
+
+##Longformer for large texts
+
+
+def longformer(TO_SUMMARIZE: str):
+    tokenizer = LongformerTokenizer.from_pretrained(
+        "allenai/longformer-large-4096-finetuned-triviaqa"
+    )
+    model = LongformerForQuestionAnswering.from_pretrained(
+        "allenai/longformer-large-4096-finetuned-triviaqa", return_dict=True
+    )
+    question, text = "Who was Jim Henson?", "Jim Henson was a nice puppet"
+    input_dict = tokenizer(question, text, return_tensors="tf")
+    outputs = model(input_dict)
+    start_logits = outputs.start_logits
+    end_logits = outputs.end_logits
+    all_tokens = tokenizer.convert_ids_to_tokens(input_dict["input_ids"].numpy()[0])
+    answer = " ".join(
+        all_tokens[
+            tf.math.argmax(start_logits, 1)[0] : tf.math.argmax(end_logits, 1)[0] + 1
+        ]
+    )
+    sequence_output = outputs.last_hidden_state
+    pooled_output = outputs.pooler_output
+    talk(pooled_output)
+    return outputs
+
+
+##############################################################################
+# def gpt2_reinforcment(UTTERANCE: str):									 #
+# 	tokenizer = AutoTokenizer.from_pretrained("lvwerra/gpt2-imdb-ctrl")		 #
+# 	model = AutoModel.from_pretrained("lvwerra/gpt2-imdb-ctrl")				 #
+##############################################################################
+
+
+def poems(input_text: str):  # run_name='/Users/r2q2/Projects/waifu2020/src/models'):
+    talk("hey let me think about that")
+    ####################################################################################
+    ### sess = gpt2.start_tf_sess()                                                  ###
+    ### gpt2.load_gpt2(sess,run_name="run1")                                         ###
+    ### talk(gpt2.generate(sess,                                                     ###
+    ###           #checkpoint_dir='/Users/r2q2/Projects/waifu2020/src/models/775M/', ###
+    ###           length=250,                                                        ###
+    ###           temperature=0.7,                                                   ###
+    ###           prefix=input_text,                                                 ###
+    ###                                                                              ###
+    ###           return_as_list=True)[0])                                           ###
+    ####################################################################################
+    # from transformers import AutoTokenizer,
+    # tokenizer = AutoTokenizer.from_pretrained("gpt2")
+    # model = AutoModelWithLMHead.from_pretrained("gpt2")
+    # generator = pipeline('text-generation', model='gpt2')
+    # set_seed(42)
+    # stuff_to_say = generator(input_text, max_length=30, num_return_sequences=1)
+    # talk(stuff_to_say)
+    # gpt2.download_gpt2(model_name=model_name)
+    # stuff_to_say = gpt2.generate(sess,
+    ##########################
+    # model_name=model_name, #
+    # prefix=input_text,     #
+    # length=40,             #
+    # temperature=0.7,       #
+    # top_p=0.9,             #
+    # nsamples=1,            #
+    # batch_size=1,          #
+    # return_as_list=True,   #
+    # #reuse=True            #
+    # )[0]                   #
+    ##########################
+    # import pdb; pdb.set_trace()
+    # talk(stuff_to_say)
+    # talk(what_to_say)
+    # return stuff_to_say
+    # TODO  add a feedback question here
+
+
+########################################################################
+# from mic_vad_streaming import ingest								   #
+# def GetInput():													   #
+# 	parameters = {'model' : '',										   #
+# 				  'scorer' : '../deepspeech-0.9.1-models.scorer',	   #
+# 				  }													   #
+# 	voice_ingest(../)												   #
+########################################################################
+
+
+def voice_ingest(model, scorer, sample_rate=16000, vad_aggressiveness=3):
+    # Load DeepSpeech model
+    if os.path.isdir(ARGS.model):
+        model_dir = ARGS.model
+        ARGS.model = os.path.join(model_dir, "output_graph.pb")
+        ARGS.scorer = os.path.join(model_dir, ARGS.scorer)
+
+    talk("Initializing model...")
+    logging.info("ARGS.model: %s", ARGS.model)
+    model = deepspeech.Model(ARGS.model)
+    if ARGS.scorer:
+        logging.info("ARGS.scorer: %s", ARGS.scorer)
+        model.enableExternalScorer(ARGS.scorer)
+
+    # Start audio with VAD
+    vad_audio = VADAudio(
+        aggressiveness=ARGS.vad_aggressiveness,
+        device=ARGS.device,
+        input_rate=ARGS.rate,
+        file=ARGS.file,
+    )
+    print("Listening (ctrl-C to exit)...")
+    frames = vad_audio.vad_collector()
+
+    # Stream from microphone to DeepSpeech using VAD
+    spinner = None
+    if not ARGS.nospinner:
+        spinner = Halo(spinner="line")
+    stream_context = model.createStream()
+    wav_data = bytearray()
+    for frame in frames:
+        if frame is not None:
+            if spinner:
+                spinner.start()
+            logging.debug("streaming frame")
+            stream_context.feedAudioContent(np.frombuffer(frame, np.int16))
+            if ARGS.savewav:
+                wav_data.extend(frame)
+        else:
+            if spinner:
+                spinner.stop()
+            logging.debug("end utterence")
+            if ARGS.savewav:
+                vad_audio.write_wav(
+                    os.path.join(
+                        ARGS.savewav,
+                        datetime.now().strftime("savewav_%Y-%m-%d_%H-%M-%S_%f.wav"),
+                    ),
+                    wav_data,
+                )
+                wav_data = bytearray()
+            text = stream_context.finishStream()
+            print("Recognized: %s" % text)
+            if ARGS.keyboard:
+                from pyautogui import typewrite
+
+                typewrite(text)
+            stream_context = model.createStream()
+
+
+def GivenCommand():
+	k = sr.Recognizer()
+	with sr.Microphone() as source:
+		print("Listening...")
+		k.pause_threshold = 1
+		audio = k.listen(source)
+	try:
+		Input = k.recognize_google(audio, language='en-us')
+		
+		print('You: ' + Input + '\n')
+
+	except sr.UnknownValueError:
+		talk('Gomen! I didn\'t get that! Try typing it here!')
+		Input = str(input('Command: '))
+
+	
+	return Input
+=======
+>>>>>>> f6d22a488d1d81039773090d0ba562d1bb7776a7
 
 
 if __name__ == '__main__':
