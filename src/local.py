@@ -17,14 +17,14 @@ from transformers import BlenderbotSmallTokenizer, BlenderbotForConditionalGener
 from transformers import AutoModelForSequenceClassification
 from transformers import (
     AutoTokenizer,
-    pipeline,
+    #pipeline,
     BlenderbotTokenizer,
     BlenderbotForConditionalGeneration,
-    Conversation,
+    #Conversation,
     TFAutoModelWithLMHead
 )
-from transformers import BlenderbotSmallTokenizer, BlenderbotForConditionalGeneration
-from transformers import pipeline
+#from transformers import BlenderbotSmallTokenizer, BlenderbotForConditionalGeneration
+#from transformers import pipeline
 import uuid, json, pickle
 from typing import List, Any
 
@@ -135,21 +135,6 @@ def GivenCommand(test_mode=True):
     return Input
 
 
-def smalltalk(utterance: str) -> List[str]:
-
-    device = "cuda:0" if torch.cuda.is_available() else "cpu"
-    logging.info("starting smalltalk")
-    mname = "facebook/blenderbot-3B"
-    model = BlenderbotForConditionalGeneration.from_pretrained(mname)
-    model.to(device)
-    tokenizer = BlenderbotTokenizer.from_pretrained(mname)
-    inputs = tokenizer([utterance], return_tensors="pt").to(device)
-    reply_ids = model.generate(**inputs)
-    responses = [
-        tokenizer.decode(g, skip_special_tokens=True, clean_up_tokenization_spaces=True)
-        for g in reply_ids
-    ]
-    return responses
 
 
 def is_a_question(utterance: str) -> bool:
@@ -253,15 +238,15 @@ def write_json(data, filename="event_log.json"):
         f.write("\n")
 
 
-def compute_sentiment(utterance: str) -> float:
-    nlp = pipeline("sentiment-analysis")
-    result = nlp(utterance)
-    score = result[0]["score"]
-    if result[0]["label"] == "NEGATIVE":
-        score = score * -1
+# def compute_sentiment(utterance: str) -> float:
+#     nlp = pipeline("sentiment-analysis")
+#     result = nlp(utterance)
+#     score = result[0]["score"]
+#     if result[0]["label"] == "NEGATIVE":
+#         score = score * -1
 
-    logging.info("The score was {}".format(score))
-    return score
+#     logging.info("The score was {}".format(score))
+#     return score
 
 
 def local_ingest():
