@@ -622,11 +622,7 @@ if __name__ == '__main__':
 
 
 		elif 'smalltalk' or 'what do you think'  in Input:
-			#user_identifier = str(request.remote_addr)
-            inference = answer_question(Input, user_identifier, 'local')
-            #output = smalltalk(Input)
-			#recipient = GivenCommand()
-                        
+			inference = answer_question(Input, user_identifier, 'local')            
 
 
 		elif 'explain' in Input:
@@ -636,6 +632,7 @@ if __name__ == '__main__':
 			with open(r'datasette_log', 'a') as f:
 				writer = csv.writer(f)
 				writer.writerow(fields)
+                
 		elif 'can i text you' or 'what is your phone number' in Input:
 			talk('1 778 403 5044')
 
