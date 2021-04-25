@@ -127,7 +127,7 @@ holidays==0.10.5.2
 holoviews==1.14.2
 html5lib==1.0.1
 httpimport==0.5.18
-httplib2==0.17.4
+httplib2==0.19.0
 httplib2shim==0.0.3
 humanize==0.5.1
 hyperopt==0.1.2
@@ -206,7 +206,7 @@ nest-asyncio==1.5.1
 networkx==2.5
 nibabel==3.0.2
 nltk==3.4.5
-notebook==5.3.1
+notebook==6.1.5
 np-utils==0.5.12.1
 numba==0.51.2
 numexpr==2.7.3
@@ -250,7 +250,7 @@ prometheus-client==0.9.0
 promise==2.3
 prompt-toolkit==1.0.18
 protobuf==3.12.4
-psutil==5.4.8
+psutil==5.6.6
 psycopg2==2.7.6.1
 ptyprocess==0.7.0
 py==1.10.0
@@ -294,7 +294,7 @@ pytz==2018.9
 pyviz-comms==2.0.1
 PyWavelets==1.1.1
 pyworld==0.2.12
-PyYAML==3.13
+PyYAML==5.4
 pyzmq==22.0.3
 qdldl==0.1.5.post0
 qtconsole==5.0.3
