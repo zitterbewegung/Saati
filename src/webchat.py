@@ -24,6 +24,13 @@ def index():
     #resp.set_cookie('userID', session['identifier'])
     return render_template("chatbot.html")
 
+@app.route("/talk")
+def index():
+    #user_identifier = session.get('identifier', uuid.uuid4())
+    #resp.set_cookie('userID', session['identifier'])
+    return render_template("talk.html")
+
+
 #@app.route('/setcookie', methods = ['POST', 'GET'])
 #def setcookie():
 #   if request.method == 'POST':
@@ -33,6 +40,16 @@ def index():
 #   resp.set_cookie('userID', user)
    
 #   return resp
+
+from flask import send_file
+
+@app.route('/get_image')
+def get_image():
+    if request.args.get('type') == '1':
+       filename = 'ok.gif'
+    else:
+       filename = 'error.jpg'
+    return send_file(filename, mimetype='image/jpg')
 
 @app.route("/get")
 #function for the bot response
