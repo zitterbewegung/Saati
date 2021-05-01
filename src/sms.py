@@ -46,7 +46,7 @@ def sms_reply():
         pass
         # Lookup a user
 
-    DATA_FILENAME = "{}-state.json".format(request.values["From"])
+    DATA_FILENAME = "C:\\Users\\r2q2\\opt\\Saati_to_commit\\state\\{}-state.json".format(request.values["From"])
     if not responded:
         event_log = []
         if os.path.exists(DATA_FILENAME):
@@ -63,14 +63,14 @@ def sms_reply():
 
         interactions = state.get("interactions", 1)
         positive_interactions = state.get("positive_interactions", 1)
-
+        negative_interactions = state.get("negative_interactions", 1)
         # interactions = 1
         if sentiment > 0:
             positive_interactions = positive_interactions + 1
         else:
-            positive_interactions = positive_interactions - 1
+            negative_interactions = negative_interactions - 1
 
-        sync_ratio = positive_interactions / interactions
+        sync_ratio = positive_interactions / negative_interactions
         responses = state.get("responses", [])
 
         instance = Saati(uuid.uuid4())
@@ -87,6 +87,7 @@ def sms_reply():
 
         # answer_question(incoming_msg)
         responce = blenderbot400M(incoming_msg)[0]
+        
         # responce = blenderbot1B(incoming_msg)[0]
         message = client.messages.create(
             body=responce,  # Join Earth's mightiest heroes. Like Kevin Bacon.",
@@ -97,18 +98,36 @@ def sms_reply():
         resp.message(responce)
         # Start our TwiML response
 
+        state_message = client.messages.create(
+            body="Responses: {} Sentiment: {}  Sync ratio: {} Interactions: {}	| Current State {}".format(
+                str(responses),
+                str(sentiment),
+                str(sync_ratio),
+                str(interactions),
+                str(instance.state),
+            ),  # Join Earth's mightiest heroes. Like Kevin Bacon.",
+            from_="17784035044",
+            to=request.values["From"],
+        )
+
+
         # talk(responce)
         responses.append(responce)
         sentiment = sentiment + compute_sentiment(incoming_msg)
         interactions = interactions + 1
 
         logging.info(
-            "Responses: {} Sentiment: {}  Sync ratio: {} Interactions: {}	| Current State {}".format(
-                str(responses),
-                str(sentiment),
-                str(sync_ratio),
-                str(interactions),
-                str(instance.state),
+            "Responses: {} Sentiment: {}  Sync ratio: {} Interactions: {} Positive Interactions {} Current State {} ".format(
+                responses,
+                sentiment,
+                sync_ratio,
+                interactions,
+                positive_interactions,
+                instance.state,
+                compute_sentiment(responce),
+                str(datetime.datetime.now()),
+                request.values["From"],
+                "sms",
             )
         )
         current_state = {

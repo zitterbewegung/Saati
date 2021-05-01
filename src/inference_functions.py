@@ -115,3 +115,67 @@ def smalltalk(utterance: str) -> List[str]:
         for g in reply_ids
     ]
     return responses
+
+def compute_sentiment(utterance: str) -> float:
+    nlp = pipeline("sentiment-analysis")
+    result = nlp(utterance)
+    score = result[0]["score"]
+    if result[0]["label"] == "NEGATIVE":
+        score = score * -1
+
+    logging.info("The score was {}".format(score))
+    return score
+
+def wav2vec2(audio_utterance: bytes):
+    # load model and tokenizer
+    tokenizer = Wav2Vec2Tokenizer.from_pretrained("facebook/wav2vec2-base-960h")
+    model = Wav2Vec2ForCTC.from_pretrained("facebook/wav2vec2-base-960h")
+
+    # define function to read in sound file
+    def map_to_array(batch):
+        speech, _ = sf.read(batch["file"])
+        batch["speech"] = speech
+        return batch
+
+    # load dummy dataset and read soundfiles
+    ds = load_dataset("patrickvonplaten/librispeech_asr_dummy", "clean", split="validation")
+    ds = ds.map(map_to_array)
+
+    # tokenize
+    input_values = tokenizer(ds["speech"][:2], return_tensors="pt", padding="longest").input_values  # Batch size 1
+
+    # retrieve logits
+    logits = model(input_values).logits
+
+    # take argmax and decode
+    predicted_ids = torch.argmax(logits, dim=-1)
+    transcription = tokenizer.batch_decode(predicted_ids)
+    return transcription
+
+def codeBert(code: str) -> List[str]:
+    """
+    PYTHON_CODE = '''
+        def pipeline(
+            task: str,
+            model: Optional = None,
+            framework: Optional[<mask>] = None,
+            **kwargs
+        ) -> Pipeline:
+            pass
+        '''.lstrip()
+    """
+    tokenizer = AutoTokenizer.from_pretrained("microsoft/CodeGPT-small-py")
+    model = AutoModelWithLMHead.from_pretrained("microsoft/CodeGPT-small-py")
+
+def conversation_multi_turn(utterance: str) -> List[str]:
+    onversational_pipeline = pipeline("conversational")
+
+    conversation_1 = Conversation("Going to the movies tonight - any suggestions?")
+    conversation_2 = Conversation("What's the last book you have read?")
+
+    conversational_pipeline([conversation_1, conversation_2])
+
+    conversation_1.add_user_input("Is it an action movie?")
+    conversation_2.add_user_input("What is the genre of this book?")
+
+    conversational_pipeline([conversation_1, conversation_2])

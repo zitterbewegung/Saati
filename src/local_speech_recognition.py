@@ -346,10 +346,122 @@ def answer_question(body):
         instance.friendzone()
 
     return responce
+g
+if __name__ == '__main__':
+
+	while True:
+
+		#Configuration
+		recordSleep = True
+		
+		Input = GivenCommand()
+		
+		#print("Upvote score is %d".format( guess_upvote_score(Input)))
+
+		Input = Input.lower() #TODO should i keep this?
+
+		if 'i am tired 'in Input:
+			#answer = journal_sleep(Input)
+			sentiment = compute_sentiment(Input)
+
+			fields=[datetime.utcnow() , Input, answer, sentiment]
+			with open(r'datasette_log', 'a') as f:
+				writer = csv.writer(f)
+				writer.writerow(fields)
+		
+		#elif "what\'s up" in Input or 'how are you' in Input:
+		#	setReplies = ['Just doing some stuff!', 'I am good!', 'Nice!', 'I am amazing and full of power']
+		#	talk(random.choice(setReplies))
+
+		#elif "who are you" in Input or 'where are you' in Input or 'what are you' in Input:
+		#	setReplies = [' I am Saati', 'In your system', 'I am an example of AI']
+		#	talk(random.choice(setReplies))
+
+		elif 'email' in Input:
+			talk('Who is the recipient? ')
+			recipient = GivenCommand()
+
+			if 'me' in recipient:
+				try:
+					talk('What should I say? ')
+					content = GivenCommand()
+
+					server = smtplib.SMTP('smtp.gmail.com', 587)
+					server.ehlo()
+					server.starttls()
+					server.login("Your_Username", 'Your_Password')
+					server.sendmail('Your_Username', "Recipient_Username", content)
+					server.close()
+					talk('Email sent!')
+
+				except:
+					talk('Sorry ! I am unable to send your message at this moment!')
+
+		elif 'nothing' in Input or 'abort' in Input or 'stop' in Input:
+
+			talk('okay')
+			talk('Bye, have a good day.')
+			sys.exit()
+
+		elif 'hello' in Input:
+			talk('hey')
+
+		elif 'bye' in Input:
+			talk('Bye, have a great day.')
+			sys.exit()
 
 
-if __name__ == "__main__":
-    local_ingest()
+		elif 'smalltalk' or 'what do you think'  in Input:
+			output = smalltalk(Input)
+			recipient = GivenCommand()
+			sentiment = compute_sentiment(Input)
+
+			fields=[datetime.utcnow() , Input, output, sentiment]
+			with open(r'datasette_log', 'a') as f:
+				writer = csv.writer(f)
+				writer.writerow(fields)
+		elif 'explain' in Input:
+			logger.debug("longformer is being used")
+			explanation = longformer(Input)
+			fields=[datetime.utcnow() , Input,explanation, sentiment]
+			with open(r'datasette_log', 'a') as f:
+				writer = csv.writer(f)
+				writer.writerow(fields)
+		elif 'can i text you' or 'what is your phone number' in Input:
+			talk('1 778 403 5044')
+
+			
+		else:
+			Input = Input
+			
+
+
+			talk('Searching...')
+			try:
+				try:
+					res = client.Input(Input)
+					outputs = next(res.outputs).text
+					talk('Alpha says')
+					talk('Gotcha')
+					talk(outputs)
+
+				except:
+					outputs = wikipedia.summary(Input, sentences=3)
+					talk('Gotcha')
+					talk('Wikipedia says')
+					talk(outputs)
+
+
+			except:
+					talk("searching on google for " + Input)
+					say = Input.replace(' ', '+')
+					webbrowser.open('https://www.google.co.in/search?q=' + Input)
+		
+			talk("Sorry I can't provide a good response")
+		
+		#talk('Next Command! Please!')
+
+    #local_ingest()
     # st.title('saati Demo')
     # starting_text = st.text_area('Hello!')
 
