@@ -27,7 +27,6 @@ instance = Saati(uuid.uuid4())
 responses = []
 # user_input = input #GivenCommand()
 
-
 @app.route("/sms", methods=["GET", "POST"])
 def sms_reply():
     """Respond to incoming calls with a simple text message."""
@@ -60,7 +59,7 @@ def sms_reply():
         if event_log != []:
             state = event_log[-1]
         sentiment = state.get("sentiment", 1)
-
+        sync_ratio = state.get("sync_ratio" , 1)
         interactions = state.get("interactions", 1)
         positive_interactions = state.get("positive_interactions", 1)
         negative_interactions = state.get("negative_interactions", 1)
@@ -68,12 +67,13 @@ def sms_reply():
         if sentiment > 0:
             positive_interactions = positive_interactions + 1
         else:
-            negative_interactions = negative_interactions - 1
+            negative_interactions = negative_interactions + 1
 
-        sync_ratio = positive_interactions / negative_interactions
+     
+        level_counter = state.get("level_counter", 1)
         responses = state.get("responses", [])
 
-        instance = Saati(uuid.uuid4())
+       
         # instance.get_graph().draw('my_state_diagram.png', prog='dot')
 
         # dump = pickle.dumps(instance)
@@ -99,12 +99,13 @@ def sms_reply():
         # Start our TwiML response
 
         state_message = client.messages.create(
-            body="Responses: {} Sentiment: {}  Sync ratio: {} Interactions: {}	| Current State {}".format(
+            body="Responses: {} Sentiment: {}  Sync ratio: {} Positive interactions {} Negative interactions {}	| Current State {}".format(
                 str(responses),
                 str(sentiment),
                 str(sync_ratio),
-                str(interactions),
-                str(instance.state),
+                str(level_counter),
+                str(positive_interactions),
+                str(negative_interactions),
             ),  # Join Earth's mightiest heroes. Like Kevin Bacon.",
             from_="17784035044",
             to=request.values["From"],
@@ -117,12 +118,14 @@ def sms_reply():
         interactions = interactions + 1
 
         logging.info(
-            "Responses: {} Sentiment: {}  Sync ratio: {} Interactions: {} Positive Interactions {} Current State {} ".format(
+            "Responses: {} Sentiment: {}  Sync ratio: {} Interactions: {} Positive Interactions {} Negative Interactions {} level_counter {} Current State {}, response_sentiment {} request_time {}".format(
                 responses,
                 sentiment,
                 sync_ratio,
                 interactions,
                 positive_interactions,
+                negative_interactions,
+                level_counter,
                 instance.state,
                 compute_sentiment(responce),
                 str(datetime.datetime.now()),
@@ -136,19 +139,21 @@ def sms_reply():
             "sync_ratio": sync_ratio,
             "interactions": interactions,
             "positive_interactions": positive_interactions,
-            "instance.state": instance.state,
+            "negative_interactions": positive_interactions,
+
+            "level_counter" : level_counter,
             "response_sentiment": compute_sentiment(responce),
             "request_time": str(datetime.datetime.now()),
             "identifier": request.values["From"],
             "origin": "sms",
         }
 
-        if 5 >= sync_ratio <= 11 or interactions < 10:
-
+        if sync_ratio > 5 and sync_ratio < 11: 
+            level_counter = level_counter + 1  
             instance.next_state()
-        else:
+        else: #  interactions > 5 and (sync_ratio < 5 or sync_ratio > 11):
             responce = "Hey, lets stay friends"
-            instance.friendzone()
+            #instance.friendzone()
         # file = open('state.pkl', 'wb')
         # with engine.begin() as connection:
         #    state_df = pd.DataFrame({"identifier" : identifier, 'response': response, 'sentiment': sentiment, "sync_ratio": sync_ratio, "interactions": interactions, "request": body, "identifier": identifier, "origin": origin})
