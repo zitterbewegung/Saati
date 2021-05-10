@@ -8,6 +8,7 @@ from logic import Saati, compute_sentiment
 from inference_functions import compute_sentiment, blenderbot400M, blenderbot1B
 import uuid, logging, os, pickle, json, datetime
 from logic import answer_question
+import redis 
 
 logging.getLogger("transitions").setLevel(logging.INFO)
 app = Flask(__name__)
@@ -21,7 +22,7 @@ app = Flask(__name__)
 
 
 instance = Saati(uuid.uuid4())
-
+r = redis.Redis('localhost', 6379, 0)
 
 # instance.get_graph().draw('my_state_diagram.png', prog='dot')
 responses = []
@@ -30,7 +31,8 @@ responses = []
 @app.route("/sms", methods=["GET", "POST"])
 def sms_reply():
     """Respond to incoming calls with a simple text message."""
-
+    
+    
     # Start our TwiML response
     resp = MessagingResponse()
     account_sid = os.environ["TWILIO_ACCOUNT_SID"]
@@ -86,7 +88,9 @@ def sms_reply():
         resp = MessagingResponse()
 
         # answer_question(incoming_msg)
-        responce = blenderbot400M(incoming_msg)[0]
+        raw_responce = blenderbot400M(incoming_msg)
+        logging.info("Raw respnce: {}".format(raw_responce))
+        responce = raw_responce[0]
         
         # responce = blenderbot1B(incoming_msg)[0]
         message = client.messages.create(
@@ -99,13 +103,14 @@ def sms_reply():
         # Start our TwiML response
 
         state_message = client.messages.create(
-            body="Responses: {} Sentiment: {}  Sync ratio: {} Positive interactions {} Negative interactions {}	| Current State {}".format(
-                str(responses),
+            body="Sentiment: {}  Sync ratio: {} Level_counter {} Positive interactions {} Negative interactions {}	| Current State {}".format(
+                #str(responses),
                 str(sentiment),
                 str(sync_ratio),
-                str(level_counter),
+                str(level_counter), 
                 str(positive_interactions),
                 str(negative_interactions),
+                instance.state,
             ),  # Join Earth's mightiest heroes. Like Kevin Bacon.",
             from_="17784035044",
             to=request.values["From"],
@@ -151,15 +156,17 @@ def sms_reply():
         if sync_ratio > 5 and sync_ratio < 11: 
             level_counter = level_counter + 1  
             instance.next_state()
-        else: #  interactions > 5 and (sync_ratio < 5 or sync_ratio > 11):
-            responce = "Hey, lets stay friends"
+        if sync_ratio > 11 or sync_ratio < 5:
+            level_counter = level_counter - 1   
+            #  interactions > 5 and (sync_ratio < 5 or sync_ratio > 11):
+            #responce = "Hey, lets stay friends"
             #instance.friendzone()
         # file = open('state.pkl', 'wb')
         # with engine.begin() as connection:
         #    state_df = pd.DataFrame({"identifier" : identifier, 'response': response, 'sentiment': sentiment, "sync_ratio": sync_ratio, "interactions": interactions, "request": body, "identifier": identifier, "origin": origin})
         #    state_df.to_sql('interactions', con=connection, if_exists='append')
         #    log.debug("Current state: {}".format(event_log))
-
+        r.mset({identifier : event_log})
         with open(DATA_FILENAME, mode="w", encoding="utf-8") as feedsjson:
             event_log.append(current_state)
             json.dump(event_log, feedsjson)
@@ -169,4 +176,4 @@ def sms_reply():
 
 if __name__ == "__main__":
     app.run(debug=True, port=5001)
-    print(message.sid)
+    #print(message.sid)
