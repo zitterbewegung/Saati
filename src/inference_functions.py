@@ -10,7 +10,7 @@ from transformers import (
 import torch
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 from transformers import pipeline, Conversation
-import logging
+import logging, json
 from typing import List, Any, Tuple
 
 conversational_pipeline = pipeline("conversational", device=0)
@@ -179,3 +179,39 @@ def conversation_multi_turn(utterance: str) -> List[str]:
     conversation_2.add_user_input("What is the genre of this book?")
 
     conversational_pipeline([conversation_1, conversation_2])
+
+
+def answer_questions_conversations(identifier: str, question: str):
+    with open(DATA_FILENAME, mode='r', encoding='utf-8') as feedsjson:
+        event_log = json.load(feedsjson)
+
+    nlp = pipeline("question-answering")
+    context = r"""
+    Extractive Question Answering is the task of extracting an answer from a text given a question. An example of a
+    question answering dataset is the SQuAD dataset, which is entirely based on that task. If you would like to fine-tune
+    a model on a SQuAD task, you may leverage the examples/pytorch/question-answering/run_squad.py script.
+    """
+    pass
+
+def tacotron2(text_to_bounce: str, file_path: str) -> Tuple[str]:
+    """This function takes text and renders it to speech
+
+    This uses tacotron from pytorch and writes it to a file.
+    """
+    
+    # preprocessing
+    sequence = np.array(tacotron2.text_to_sequence(text, ['english_cleaners']))[None, :]
+    sequence = torch.from_numpy(sequence).to(device='cuda', dtype=torch.int64)
+
+    # run the models
+    with torch.no_grad():
+        _, mel, _, _ = tacotron2.infer(sequence)
+        audio = waveglow.infer(mel)
+    audio_numpy = audio[0].data.cpu().numpy()
+    rate = 22050
+    write(file_path, rate, audio_numpy)
+    Audio(audio_numpy, rate=rate)
+    
+    return (responses , audio_numpy)
+
+    
