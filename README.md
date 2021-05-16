@@ -11,7 +11,7 @@ The success of virtual youtubers Calliope and Kiara who are a part of hololive-E
 
 How this works is that once you interact by saying something to the virtual agent it will query the language model with the response and also perform sentiment analysis on your interaction. Then we have a running total of positive and negative things that you say to the virtual agent. If the amount of positive and negative interactions is five to one then you will advance in the simulation / game. Advancement will eventually unlock new ways to contact the system. In other words advancement is done by achievement and other ways to perform sentiment analysis may become in play. 
 
-This could also be applied using a therapeutic way of lowering your anxiety by making the interactions in dating let you desensitize yourself with the interactions.
+This could also be applied using a therapeutic way of lowering your anxiety by making the interactions in dating let you desensitize yourself with the interactions.
 
 To accomplish this I use the transformers library to perform sentiment analysis on an incoming message. After performing sentiment analysis I compute what I call is a synchronization ratio  is computed which corresponds to the ratio of the positive and negative interactions. What is also kept track of is the total amount of interactions. I give eleven interactions as a mulligan value to allow for the five to one ratio. If the mulligan value is exceeded and the sync_ratio isn’t fulfilled then the game will put you into the friend zone state and you can’t get out of the friend zone state.
 
