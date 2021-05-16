@@ -3,7 +3,7 @@ satti
 
 Saati is an open source virtual dating / idol simulator that uses generative models 
 
-The project is inspired by the video games like AI Dungeon game and wants to build on top of that by making an open ended dating simulator which can scale up to an idol simulator.
+The project is inspired by the video games like AI Dungeon, visual novels and virtual youtubers.
 
 The main concept is to make an open ended video game that primarily uses language models and sentiment analysis to advance story progression and also provide visual stimuli that goes up to the limit of the uncanny valley.
 
