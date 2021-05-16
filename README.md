@@ -7,7 +7,9 @@ The project is inspired by the video games like AI Dungeon, visual novels and vi
 
 The main concept is to make an open ended video game that primarily uses language models and sentiment analysis to advance story progression and also provide visual stimuli that goes up to the limit of the uncanny valley.
 
-The success of virtual youtubers Calliope and Kiara who are a part of hololive-EN show that this kind of interface can avoid this until computer vision techniques can get us past that. 
+The success of virtual youtubers show that this kind of interface can avoid certain parts of the uncanny valley but initial systems will suffer grealy from this regardless (text to speech and emotion expression are the biggest parts). The current focus of the project is to integrate existing speech recognition, text to speech and anime style facial expression systems that are synchronized with the text to speech engine.
+
+To handle general speech only For text to speech Tacotron2 is being used.
 
 How this works is that once you interact by saying something to the virtual agent it will query the language model with the response and also perform sentiment analysis on your interaction. Then we have a running total of positive and negative things that you say to the virtual agent. If the amount of positive and negative interactions is five to one then you will advance in the simulation / game. Advancement will eventually unlock new ways to contact the system. In other words advancement is done by achievement and other ways to perform sentiment analysis may become in play. 
 
@@ -17,16 +19,8 @@ To accomplish this I use the transformers library to perform sentiment analysis 
 
 The actual gameplay currently uses blenderbot which is a model created by Facebook. I evaluated it against dialogpt from Microsoft and in my testing blenderbot was a much better system.  I also use a distilled version with one tenth of the parameters so that the interactions are perceived in realtime. Using larger versions of blenderbot with my current hardware makes responses take over one minute.
 
-I record state currently by using an identifier (for web chat it uses an IP address and for sms it is the incoming phone number).
+The state of the system is a json file written to disk but Redis and or Postgres might be used in the future. Each user is tied to an identifier for thwere the conversation is started. Eventually there will be a login system to unify identifier.
 
-I use Colab Pro to prototype new features and eventually encapsulate it into a function and then I put it in the inference_functions in the src directory. 
-
-A modular and extendable visual vocal assistant. The modules that are planned of highest priority:
-
-1. A socialization simulator
-2. Vocal assistant
-3. Push and pull behavior to provide general reminders
-4. A system to encourage good behavior
 
 Development log below: 
 
