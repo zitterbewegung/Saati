@@ -15,9 +15,9 @@ How this works is that once you interact by saying something to the virtual agen
 
 This could also be applied using a therapeutic way of lowering your anxiety by making the interactions in dating let you desensitize yourself with the interactions.
 
-To accomplish this I use the transformers library to perform sentiment analysis on an incoming message. After performing sentiment analysis I compute what I call is a synchronization ratio  is computed which corresponds to the ratio of the positive and negative interactions. What is also kept track of is the total amount of interactions. I give eleven interactions as a mulligan value to allow for the five to one ratio. If the mulligan value is exceeded and the sync_ratio isn’t fulfilled then the game will put you into the friend zone state and you can’t get out of the friend zone state.
+To accomplish this I use the transformers library to perform sentiment analysis on an incoming message. After performing sentiment analysis I compute what I call is a synchronization ratio is computed which corresponds to the ratio of the positive and negative interactions. What is also kept track of is the total amount of interactions. 
 
-The actual gameplay currently uses blenderbot which is a model created by Facebook. I evaluated it against dialogpt from Microsoft and in my testing blenderbot was a much better system.  I also use a distilled version with one tenth of the parameters so that the interactions are perceived in realtime. Using larger versions of blenderbot with my current hardware makes responses take over one minute.
+The actual gameplay currently uses blenderbot which is a model created by Facebook. I evaluated it against dialogpt from Microsoft and in my testing blenderbot gave much better conversations (specifically Blenderbot 400M. Using larger versions of blenderbot with my current hardware makes responses take over one minute so the lower parameter model is used to reduce latency.
 
 The state of the system is a json file written to disk but Redis and or Postgres might be used in the future. Each user is tied to an identifier for thwere the conversation is started. Eventually there will be a login system to unify identifier.
 
