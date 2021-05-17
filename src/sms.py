@@ -8,7 +8,7 @@ from logic import Saati, compute_sentiment
 from inference_functions import compute_sentiment, blenderbot400M, blenderbot1B
 import uuid, logging, os, pickle, json, datetime
 from logic import answer_question
-import redis 
+#import redis 
 
 logging.getLogger("transitions").setLevel(logging.INFO)
 app = Flask(__name__)
@@ -22,7 +22,7 @@ app = Flask(__name__)
 
 
 instance = Saati(uuid.uuid4())
-r = redis.Redis('localhost', 6379, 0)
+#r = redis.Redis('localhost', 6379, 0)
 
 # instance.get_graph().draw('my_state_diagram.png', prog='dot')
 responses = []
@@ -43,9 +43,9 @@ def sms_reply():
     incoming_msg = request.values.get("Body", None)
 
     responded = False
-    if incoming_msg:
-        pass
-        # Lookup a user
+    #if incoming_msg:
+    #    pass
+    #    # Lookup a user
 
     DATA_FILENAME = "C:\\Users\\r2q2\\opt\\Saati_to_commit\\state\\{}-state.json".format(request.values["From"])
     if not responded:
@@ -74,8 +74,7 @@ def sms_reply():
      
         level_counter = state.get("level_counter", 1)
         responses = state.get("responses", [])
-
-       
+        
         # instance.get_graph().draw('my_state_diagram.png', prog='dot')
 
         # dump = pickle.dumps(instance)
@@ -123,7 +122,8 @@ def sms_reply():
         interactions = interactions + 1
 
         logging.info(
-            "Responses: {} Sentiment: {}  Sync ratio: {} Interactions: {} Positive Interactions {} Negative Interactions {} level_counter {} Current State {}, response_sentiment {} request_time {}".format(
+            "Incoming Message: {} Responses: {} Sentiment: {}  Sync ratio: {} Interactions: {} Positive Interactions {} Negative Interactions {} level_counter {} Current State {}, response_sentiment {} request_time {}".format(
+                incoming_msg,
                 responses,
                 sentiment,
                 sync_ratio,
@@ -142,7 +142,9 @@ def sms_reply():
             "responses": responses,
             "sentiment": sentiment,
             "sync_ratio": sync_ratio,
+            "incoming_msg" : incoming_msg,
             "interactions": interactions,
+            
             "positive_interactions": positive_interactions,
             "negative_interactions": positive_interactions,
 
@@ -166,7 +168,7 @@ def sms_reply():
         #    state_df = pd.DataFrame({"identifier" : identifier, 'response': response, 'sentiment': sentiment, "sync_ratio": sync_ratio, "interactions": interactions, "request": body, "identifier": identifier, "origin": origin})
         #    state_df.to_sql('interactions', con=connection, if_exists='append')
         #    log.debug("Current state: {}".format(event_log))
-        r.mset({identifier : event_log})
+        #r.mset({identifier : event_log})
         with open(DATA_FILENAME, mode="w", encoding="utf-8") as feedsjson:
             event_log.append(current_state)
             json.dump(event_log, feedsjson)
