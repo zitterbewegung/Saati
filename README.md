@@ -1,7 +1,7 @@
 satti
 ==============================
 
-Saati is an open source virtual dating / idol simulator that uses generative models 
+Saati is an open source virtual avatar simulator that uses generative models 
 
 The project is inspired by the video games like AI Dungeon, visual novels and virtual youtubers.
 
