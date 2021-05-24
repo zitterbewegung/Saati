@@ -5,10 +5,10 @@ from twilio.rest import Client
 from flask import Flask, request, redirect
 from twilio.twiml.messaging_response import MessagingResponse
 from logic import Saati, compute_sentiment
-from inference_functions import compute_sentiment, blenderbot400M, blenderbot1B
+from inference_functions import compute_sentiment, blenderbot400M, blenderbot1B, general_questions 
 import uuid, logging, os, pickle, json, datetime
 from logic import answer_question
-#import redis 
+import redis 
 
 logging.getLogger("transitions").setLevel(logging.INFO)
 app = Flask(__name__)
@@ -22,7 +22,7 @@ app = Flask(__name__)
 
 
 instance = Saati(uuid.uuid4())
-#r = redis.Redis('localhost', 6379, 0)
+r = redis.Redis('localhost', 6379, 0)
 
 # instance.get_graph().draw('my_state_diagram.png', prog='dot')
 responses = []
@@ -58,6 +58,7 @@ def sms_reply():
             with open(DATA_FILENAME, mode="w", encoding="utf-8") as f:
                 json.dump([], f)
         state = {}
+        
         if event_log != []:
             state = event_log[-1]
         sentiment = state.get("sentiment", 1)
@@ -87,6 +88,10 @@ def sms_reply():
         resp = MessagingResponse()
 
         # answer_question(incoming_msg)
+        #if incoming_msg == 'What did we talk about?':
+        #    previous_interactions = 
+        #    raw_responce = general_questions(
+
         raw_responce = blenderbot400M(incoming_msg)
         logging.info("Raw respnce: {}".format(raw_responce))
         responce = raw_responce[0]
@@ -168,11 +173,12 @@ def sms_reply():
         #    state_df = pd.DataFrame({"identifier" : identifier, 'response': response, 'sentiment': sentiment, "sync_ratio": sync_ratio, "interactions": interactions, "request": body, "identifier": identifier, "origin": origin})
         #    state_df.to_sql('interactions', con=connection, if_exists='append')
         #    log.debug("Current state: {}".format(event_log))
-        #r.mset({identifier : event_log})
+       
         with open(DATA_FILENAME, mode="w", encoding="utf-8") as feedsjson:
             event_log.append(current_state)
             json.dump(event_log, feedsjson)
-
+        logging.debug(request.values["From"])
+        r.mset({request.values["From"] : str(event_log)})     
         return str(responce)
 
 
