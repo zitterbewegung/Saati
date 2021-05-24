@@ -11,7 +11,7 @@ import torch
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 from transformers import pipeline, Conversation
 import logging, json
-from typing import List, Any, Tuple
+from typing import List, Any, Tuple, Dict
 
 conversational_pipeline = pipeline("conversational", device=0)
 
@@ -31,7 +31,7 @@ def questions(question: str, text: str) -> List[str]:
     tokenizer = AutoTokenizer.from_pretrained('ibert-roberta-base')
     model = AutoTokenizer.from_pretrained('ibert-roberta-base')
 
-    question, text = "Who was Jim Henson?", "Jim Henson was a nice puppet"
+    #question, text = "Who was Jim Henson?", "Jim Henson was a nice puppet"
     inputs = tokenizer(question, text, return_tensors='pt')
     start_positions = torch.tensor([1])
     end_positions = torch.tensor([3])
@@ -44,7 +44,16 @@ def questions(question: str, text: str) -> List[str]:
 
 def general_questions(question: str, text: str) -> List[str]:
     nlp = pipeline("question-answering")
-    return nlp
+    result = question_answerer(question=question, context=context)
+    return result
+
+def emotion_category(user_utterance: str, labels: List[str] ) -> Dict[str, str]:
+    '''
+    From https://akoksal.com/articles/zero-shot-text-classification-evaluation
+    '''
+    classifier = pipeline("zero-shot-classification", device=0)
+    return  classifier(text, labels)
+
     #tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased-distilled-squad")
 
     #model = AutoModelForQuestionAnswering.from_pretrained("distilbert-base-uncased-distilled-squad")

@@ -99,7 +99,7 @@ class Saati(object):
 
 
 
-def answer_question(body, identifier, origin):
+def answer_question(incoming_msg, identifier, origin):
     """
     >>> answer_question('hello', '709c346d-4188-4a72-adeb-45308840c549', 'webchat')
     ' Hello! How are you doing today? I just got back from a walk with my dog.'
@@ -108,7 +108,7 @@ def answer_question(body, identifier, origin):
     
     event_log = []
     log = logging.getLogger('saati.logic')
-    log.debug('Response: {} Identifier {}, State file: {}'.format(body, identifier, DATA_FILENAME))
+    log.debug('Response: {} Identifier {}, State file: {}'.format(incoming_msg, identifier, DATA_FILENAME))
     log.info('restoring state')
     if os.path.exists(DATA_FILENAME):
         with open(DATA_FILENAME, mode='r', encoding='utf-8') as feedsjson:
@@ -120,15 +120,24 @@ def answer_question(body, identifier, origin):
     state = {}  
     if event_log != []:
         state = event_log[-1]
-    sentiment = state.get('sentiment', 1)
 
-    interactions = state.get('interactions', 1)
-    positive_interactions = state.get('positive_interactions', 1)
-    negative_interactions = state.get('negative_interactions', 1)
-    sync_ratio = state.get('sync_ratio', 1)
+    state = {}
+    if event_log != []:
+        state = event_log[-1]
+    sentiment = state.get("sentiment", 1)
+    sync_ratio = state.get("sync_ratio" , 1)
+    interactions = state.get("interactions", 1)
+    positive_interactions = state.get("positive_interactions", 1)
+    negative_interactions = state.get("negative_interactions", 1)
+    # interactions = 1
+    if sentiment > 0:
+        positive_interactions = positive_interactions + 1
+    else:
+        negative_interactions = negative_interactions + 1
 
 
-    responses = state.get('responses', [])
+    level_counter = state.get("level_counter", 1)
+    responses = state.get("responses", [])
 
     instance_from_log = [
         str(responses),
@@ -141,10 +150,10 @@ def answer_question(body, identifier, origin):
     instance = Saati(uuid.uuid4(), instance_from_log)
 
     log.info("Computing reply")
-    responce = blenderbot400M(body)[0] 
+    responce = blenderbot400M(incoming_msg)[0] 
 
     responses.append(responce)
-    sentiment = sentiment + compute_sentiment(body)
+    sentiment = sentiment + compute_sentiment(incoming_msg)
 
     if sentiment > 0:
         positive_interactions = positive_interactions + 1
@@ -155,40 +164,45 @@ def answer_question(body, identifier, origin):
     sync_ratio = positive_interactions / negative_interactions
 
     interactions = interactions + 1
-    log.info(
-        "Responses: {} Sentiment: {}  Sync ratio: {} Interactions: {}	| Current State {}".format(
-            str(responses),
-            str(sentiment),
-            str(sync_ratio),
-            str(interactions),
-            str(instance.state),
+    logging.info(
+        "Incoming Message: {} Responses: {} Sentiment: {}  Sync ratio: {} Interactions: {} Positive Interactions {} Negative Interactions {} level_counter {} Current State {}, response_sentiment {} timestamp {}".format(
+            incoming_msg,
+            responses,
+            sentiment,
+            sync_ratio,
+            interactions,
+            positive_interactions,
+            negative_interactions,
+            level_counter,
+            instance.state,
+            compute_sentiment(responce),
+            str(datetime.now()),
+            identifier,
+            origin,
         )
     )
-    #engine = create_engine('sqlite://', echo=False)
-    #df = pd.DataFrame({'name' : ['User 1', 'User 2', 'User 3']})
+    current_state = {
+        "responses": responses,
+        "sentiment": sentiment,
+        "sync_ratio": sync_ratio,
+        "incoming_msg" : incoming_msg,
+        "interactions": interactions,
 
-    
-    if 5 >= sync_ratio <= 11 and interactions < 5:
-        instance.update_sync_ratio()
+        "positive_interactions": positive_interactions,
+        "negative_interactions": positive_interactions,
+
+        "level_counter" : level_counter,
+        "response_sentiment": compute_sentiment(responce),
+        "timestamp": str(datetime.now()),
+        "identifier": identifier,
+        "origin": origin,
+    }
+
+    if sync_ratio > 5 and sync_ratio < 11: 
+        level_counter = level_counter + 1  
         instance.next_state()
-    else:
-        #talk("Hey, lets stay friends")
-        instance.friendzone()
-    #file = open('state.pkl', 'wb')
-    # store the machine
-    #dump = pickle.dumps(m)
-
-    current_state = {'responses': responses,
-                    'sentiment': sentiment,
-                    'sync_ratio' : sync_ratio,
-                    'interactions': interactions,
-                    'positive_interactions': positive_interactions,
-                    'instance.state' : instance.state,
-                    'request_time':  str(datetime.now()),
-                    'identifier' : identifier,
-                    'origin' : origin
-                    }
-
+    if sync_ratio > 11 or sync_ratio < 5:
+        level_counter = level_counter - 1   
 
     with open(DATA_FILENAME, mode='w', encoding='utf-8') as feedsjson:
         event_log.append(current_state)

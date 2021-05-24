@@ -25,11 +25,8 @@ sacremoses==0.0.45
 six==1.16.0
 SQLAlchemy==1.4.14
 tokenizers==0.10.2
-torch==1.8.1+cu111
-torchaudio==0.8.1
-torchvision==0.9.1+cu111
 tqdm==4.60.0
-transformers==4.5.1
+transformers==4.6.0
 transitions==0.8.8
 twilio==6.58.0
 typing-extensions==3.10.0.0
