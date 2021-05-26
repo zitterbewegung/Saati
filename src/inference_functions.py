@@ -47,12 +47,14 @@ def general_questions(question: str, text: str) -> List[str]:
     result = question_answerer(question=question, context=context)
     return result
 
-def emotion_category(user_utterance: str, labels: List[str] ) -> Dict[str, str]:
+def emotion_category(utterance: str) -> Dict[str, str]:
     '''
     From https://akoksal.com/articles/zero-shot-text-classification-evaluation
+    
     '''
+    candidate_labels = ["anger", "fear", "joy", "love", "sadness", "surprise"]
     classifier = pipeline("zero-shot-classification", device=0)
-    return  classifier(text, labels)
+    return  classifier(utterance, candidate_labels)
 
     #tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased-distilled-squad")
 

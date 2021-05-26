@@ -5,7 +5,7 @@ from twilio.rest import Client
 from flask import Flask, request, redirect
 from twilio.twiml.messaging_response import MessagingResponse
 from logic import Saati, compute_sentiment
-from inference_functions import compute_sentiment, blenderbot400M, blenderbot1B, general_questions 
+from inference_functions import compute_sentiment, blenderbot400M, blenderbot1B, general_questions, emotion_category
 import uuid, logging, os, pickle, json, datetime
 from logic import answer_question
 import redis 
@@ -69,7 +69,7 @@ def sms_reply():
         # interactions = 1
         if sentiment > 0:
             positive_interactions = positive_interactions + 1
-        else:
+        if sentiment < 0:
             negative_interactions = negative_interactions + 1
 
      
@@ -137,7 +137,7 @@ def sms_reply():
                 negative_interactions,
                 level_counter,
                 instance.state,
-                compute_sentiment(responce),
+                emotion_category(responce),
                 str(datetime.datetime.now()),
                 request.values["From"],
                 "sms",
@@ -154,7 +154,7 @@ def sms_reply():
             "negative_interactions": positive_interactions,
 
             "level_counter" : level_counter,
-            "response_sentiment": compute_sentiment(responce),
+            "response_sentiment": emotion_category(responce),
             "request_time": str(datetime.datetime.now()),
             "identifier": request.values["From"],
             "origin": "sms",
