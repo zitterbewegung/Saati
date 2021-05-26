@@ -61,17 +61,12 @@ def sms_reply():
         
         if event_log != []:
             state = event_log[-1]
-        sentiment = state.get("sentiment", 1)
+        sentiment = state.get("sentiment", 0)
         sync_ratio = state.get("sync_ratio" , 1)
         interactions = state.get("interactions", 1)
         positive_interactions = state.get("positive_interactions", 1)
         negative_interactions = state.get("negative_interactions", 1)
         # interactions = 1
-        if sentiment > 0:
-            positive_interactions = positive_interactions + 1
-        if sentiment < 0:
-            negative_interactions = negative_interactions + 1
-
      
         level_counter = state.get("level_counter", 1)
         responses = state.get("responses", [])
@@ -86,7 +81,16 @@ def sms_reply():
 
         logging.info("Computing reply")
         resp = MessagingResponse()
+        
+        sentiment = compute_sentiment(incoming_msg)
+       
+        if sentiment > 0:
+            positive_interactions = positive_interactions + 1
+        if sentiment < 0:
+            negative_interactions = negative_interactions + 1
 
+        
+        
         # answer_question(incoming_msg)
         #if incoming_msg == 'What did we talk about?':
         #    previous_interactions = 
@@ -123,7 +127,7 @@ def sms_reply():
 
         # talk(responce)
         responses.append(responce)
-        sentiment = sentiment + compute_sentiment(incoming_msg)
+        #sentiment = sentiment + 
         interactions = interactions + 1
 
         logging.info(
