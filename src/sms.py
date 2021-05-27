@@ -62,7 +62,7 @@ def sms_reply():
         if event_log != []:
             state = event_log[-1]
         sentiment = state.get("sentiment", 0)
-        sync_ratio = state.get("sync_ratio" , 1)
+        #sync_ratio = state.get("sync_ratio" , 1)
         interactions = state.get("interactions", 1)
         positive_interactions = state.get("positive_interactions", 1)
         negative_interactions = state.get("negative_interactions", 1)
@@ -84,9 +84,9 @@ def sms_reply():
         
         sentiment = compute_sentiment(incoming_msg)
        
-        if sentiment > 0:
+        if sentiment == 'POSITIVE':
             positive_interactions = positive_interactions + 1
-        if sentiment < 0:
+        if sentiment == 'NEGATIVE':
             negative_interactions = negative_interactions + 1
 
         
@@ -109,6 +109,16 @@ def sms_reply():
         # Get users phone to respond.
         resp.message(responce)
         # Start our TwiML response
+        interactions = interactions + 1
+        
+        sync_ratio = positive_interactions / negative_interactions
+
+        if sync_ratio > 5 and sync_ratio < 11: 
+            level_counter = level_counter + 1  
+            #instance.next_state()
+        if sync_ratio > 11 or sync_ratio < 5:
+            level_counter = level_counter - 1   
+
 
         state_message = client.messages.create(
             body="Sentiment: {}  Sync ratio: {} Level_counter {} Positive interactions {} Negative interactions {}	| Current State {}".format(
@@ -128,7 +138,6 @@ def sms_reply():
         # talk(responce)
         responses.append(responce)
         #sentiment = sentiment + 
-        interactions = interactions + 1
 
         logging.info(
             "Incoming Message: {} Responses: {} Sentiment: {}  Sync ratio: {} Interactions: {} Positive Interactions {} Negative Interactions {} level_counter {} Current State {}, response_sentiment {} request_time {}".format(
@@ -155,7 +164,7 @@ def sms_reply():
             "interactions": interactions,
             
             "positive_interactions": positive_interactions,
-            "negative_interactions": positive_interactions,
+            "negative_interactions": negative_interactions,
 
             "level_counter" : level_counter,
             "response_sentiment": emotion_category(responce),
@@ -164,11 +173,6 @@ def sms_reply():
             "origin": "sms",
         }
 
-        if sync_ratio > 5 and sync_ratio < 11: 
-            level_counter = level_counter + 1  
-            instance.next_state()
-        if sync_ratio > 11 or sync_ratio < 5:
-            level_counter = level_counter - 1   
             #  interactions > 5 and (sync_ratio < 5 or sync_ratio > 11):
             #responce = "Hey, lets stay friends"
             #instance.friendzone()
