@@ -25,9 +25,6 @@
 [submodule "app/elastic_transformers"]
 	path = app/elastic_transformers
 	url = https://github.com/md-experiments/elastic_transformers
-[submodule "app/redis-pubsub-twilio"]
-	path = app/redis-pubsub-twilio
-	url = https://github.com/gabicavalcante/redis-pubsub-twilio
 [submodule "src/AI-Vocaloid-Kit-V2"]
 	path = src/AI-Vocaloid-Kit-V2
 	url = https://github.com/zitterbewegung/AI-Vocaloid-Kit-V2.git
