@@ -346,7 +346,7 @@ def answer_question(body):
         instance.friendzone()
 
     return responce
-g
+
 if __name__ == '__main__':
 
 	while True:
