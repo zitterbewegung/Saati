@@ -28,3 +28,6 @@
 [submodule "src/AI-Vocaloid-Kit-V2"]
 	path = src/AI-Vocaloid-Kit-V2
 	url = https://github.com/zitterbewegung/AI-Vocaloid-Kit-V2.git
+[submodule "src/stroke-ae"]
+	path = src/stroke-ae
+	url = git@github.com:dasayan05/stroke-ae.git
