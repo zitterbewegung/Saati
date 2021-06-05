@@ -8,13 +8,16 @@ from transformers import (
     Conversation,
 )
 import torch
+import random
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 from transformers import pipeline, Conversation
 import logging, json
 from typing import List, Any, Tuple, Dict
+from functools import cache
 
 conversational_pipeline = pipeline("conversational", device=0)
 
+@cache
 def blenderbot400M(utterance: str) -> List[str]:
 
     tokenizer = AutoTokenizer.from_pretrained("facebook/blenderbot-400M-distill")
@@ -27,6 +30,13 @@ def blenderbot400M(utterance: str) -> List[str]:
     ]
     return responses
 
+
+def blenderbot1B(utterance: str) -> List[str]:
+    """DONT USE THIS """
+    responses = ['dont use this']
+    return responses
+
+
 def questions(question: str, text: str) -> List[str]:
     tokenizer = AutoTokenizer.from_pretrained('ibert-roberta-base')
     model = AutoTokenizer.from_pretrained('ibert-roberta-base')
@@ -38,6 +48,7 @@ def questions(question: str, text: str) -> List[str]:
 
     outputs = model(**inputs, start_positions=start_positions, end_positions=end_positions)
     loss = outputs.loss
+
     start_scores = outputs.start_logits
     end_scores = outputs.end_logits
     return outputs
@@ -85,6 +96,7 @@ def conversation(utterance: str, continuing_conversation=False):
 
     #conversational_pipeline([conv1, conv2])
 
+@cache
 def blenderbot3B(utterance: str):
     tokenizer = AutoTokenizer.from_pretrained("facebook/blenderbot-3B")
 
@@ -95,19 +107,6 @@ def blenderbot3B(utterance: str):
         tokenizer.decode(g, skip_special_tokens=True, clean_up_tokenization_spaces=True)
         for g in reply_ids
     ]
-    return responses
-
-def blenderbot1B(utterance: str):
-    
-    tokenizer = AutoTokenizer.from_pretrained("facebook/blenderbot-1B-distill")
-
-    model = AutoModelForSeq2SeqLM.from_pretrained("facebook/blenderbot-1B-distill")
-    inputs = tokenizer([utterance], return_tensors="pt")
-    reply_ids = model.generate(**inputs)
-    responses = [
-        tokenizer.decode(g, skip_special_tokens=True, clean_up_tokenization_spaces=True)
-        for g in reply_ids
-        ]
     return responses
 
         
@@ -127,15 +126,15 @@ def smalltalk(utterance: str) -> List[str]:
     ]
     return responses
 
-def compute_sentiment(utterance: str) -> float:
+def compute_sentiment(utterance: str) -> Dict[str, str]:
     nlp = pipeline("sentiment-analysis")
-    result = nlp(utterance)
-    score = result[0]["score"]
-    if result[0]["label"] == "NEGATIVE":
-        score = score * -1
+    result = nlp(utterance)[0]['label']
+    #score = result[0]["score"]
+    #if result[0]["label"] == "NEGATIVE":
+    #    score = score * -1
 
-    logging.info("The score was {}".format(score))
-    return score
+    #logging.info("The score was {}".format(score))
+    return result
 
 def wav2vec2(audio_utterance: bytes):
     # load model and tokenizer
@@ -204,6 +203,7 @@ def answer_questions_conversations(identifier: str, question: str):
     """
     pass
 
+#@app.task
 def tacotron2(text_to_bounce: str, file_path: str) -> Tuple[str]:
     """This function takes text and renders it to speech
 

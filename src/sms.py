@@ -5,7 +5,7 @@ from twilio.rest import Client
 from flask import Flask, request, redirect
 from twilio.twiml.messaging_response import MessagingResponse
 from logic import Saati, compute_sentiment
-from inference_functions import compute_sentiment, blenderbot400M, blenderbot1B, general_questions, emotion_category
+from inference_functions import compute_sentiment, blenderbot400M, blenderbot3B, general_questions, emotion_category
 import uuid, logging, os, pickle, json, datetime
 from logic import answer_question
 import redis 
@@ -47,7 +47,7 @@ def sms_reply():
     #    pass
     #    # Lookup a user
 
-    DATA_FILENAME = "C:\\Users\\r2q2\\opt\\Saati_to_commit\\state\\{}-state.json".format(request.values["From"])
+    DATA_FILENAME = "{}-state.json".format(request.values["From"])
     if not responded:
         event_log = []
         if os.path.exists(DATA_FILENAME):
@@ -96,11 +96,14 @@ def sms_reply():
         #    previous_interactions = 
         #    raw_responce = general_questions(
 
-        raw_responce = blenderbot400M(incoming_msg)
-        logging.info("Raw respnce: {}".format(raw_responce))
-        responce = raw_responce[0]
+        #
+        logging.info('Start inference')
+        responce = blenderbot3B(incoming_msg)[0]
         
-        # responce = blenderbot1B(incoming_msg)[0]
+        logging.info("Raw respnce: {}".format(responce))
+        #responce = raw_responce
+        
+        
         message = client.messages.create(
             body=responce,  # Join Earth's mightiest heroes. Like Kevin Bacon.",
             from_="17784035044",
