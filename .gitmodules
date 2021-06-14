@@ -28,9 +28,9 @@
 [submodule "src/AI-Vocaloid-Kit-V2"]
 	path = src/AI-Vocaloid-Kit-V2
 	url = https://github.com/zitterbewegung/AI-Vocaloid-Kit-V2.git
-[submodule "src/BotVsBottom"]
-	path = src/BotVsBottom
-	url = git@github.com:karlmarx/BotVsBottom.git
 [submodule "app/Tinder"]
 	path = app/Tinder
 	url = git@github.com:iamjdpatel/Tinder.git
+[submodule "src/stroke-ae"]
+	path = src/stroke-ae
+	url = git@github.com:dasayan05/stroke-ae.git
