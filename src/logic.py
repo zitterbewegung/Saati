@@ -130,10 +130,6 @@ def answer_question(incoming_msg, identifier, origin):
     positive_interactions = state.get("positive_interactions", 1)
     negative_interactions = state.get("negative_interactions", 1)
     # interactions = 1
-    if sentiment > 0:
-        positive_interactions = positive_interactions + 1
-    else:
-        negative_interactions = negative_interactions + 1
 
 
     level_counter = state.get("level_counter", 1)
@@ -150,17 +146,18 @@ def answer_question(incoming_msg, identifier, origin):
     instance = Saati(uuid.uuid4(), instance_from_log)
 
     log.info("Computing reply")
-    responce = blenderbot400M(incoming_msg)[0] 
+    responce = blenderbot3B(incoming_msg)[0] 
 
     responses.append(responce)
-    sentiment = sentiment + compute_sentiment(incoming_msg)
+    sentiment = compute_sentiment(incoming_msg)
 
-    if sentiment > 0:
+    if sentiment == 'POSITIVE':
         positive_interactions = positive_interactions + 1
-    
-    if sentiment < 0:
-        negative_interactions = negative_interactions + 1
 
+    if sentiment == 'NEGATIVE':
+        negative_interactions = negative_interactions + 1
+        
+        
     sync_ratio = positive_interactions / negative_interactions
 
     interactions = interactions + 1
@@ -236,7 +233,7 @@ class CoffeeLevel(object):
             ignore_invalid_triggers=True,
         )
 
-if __name__ == "__main__":
-    answer_question("hello", "709", "temp", "test_state.json")
-    import doctest
-    doctest.testmod()
+#if __name__ == "__main__":
+#    answer_question("hello", "709", "temp", "test_state.json")
+#    import doctest
+#    doctest.testmod()
