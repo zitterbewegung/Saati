@@ -5,7 +5,7 @@ from twilio.rest import Client
 from flask import Flask, request, redirect
 from twilio.twiml.messaging_response import MessagingResponse
 from logic import Saati, compute_sentiment
-from inference_functions import compute_sentiment, blenderbot400M, blenderbot3B, general_questions, emotion_category
+from inference_functions import compute_sentiment, blenderbot400M, blenderbot3B, general_questions, emotion_category, openai_utterance
 import uuid, logging, os, pickle, json, datetime
 from logic import answer_question
 import redis 
@@ -98,7 +98,10 @@ def sms_reply():
 
         #
         logging.info('Start inference')
+         
         responce = blenderbot3B(incoming_msg)[0]
+
+        #responce = openai_utterance(incoming_msg)
         
         logging.info("Raw respnce: {}".format(responce))
         #responce = raw_responce
@@ -122,7 +125,7 @@ def sms_reply():
         if sync_ratio > 11 or sync_ratio < 5:
             level_counter = level_counter - 1   
 
-
+    
         state_message = client.messages.create(
             body="Sentiment: {}  Sync ratio: {} Level_counter {} Positive interactions {} Negative interactions {}	| Current State {}".format(
                 #str(responses),
