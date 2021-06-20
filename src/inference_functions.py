@@ -14,12 +14,14 @@ from transformers import pipeline, Conversation
 import logging, json
 from typing import List, Any, Tuple, Dict
 from functools import cache
+import os
+import openai
 
-conversational_pipeline = pipeline("conversational", device=0)
+#conversational_pipeline = pipeline("conversational", device=0)
 
 @cache
 def blenderbot400M(utterance: str) -> List[str]:
-
+    torch.random.seed()
     tokenizer = AutoTokenizer.from_pretrained("facebook/blenderbot-400M-distill")
     model = AutoModelForSeq2SeqLM.from_pretrained("facebook/blenderbot-400M-distill")
     inputs = tokenizer([utterance], return_tensors="pt")
@@ -31,6 +33,40 @@ def blenderbot400M(utterance: str) -> List[str]:
     return responses
 
 
+@cache
+def openai_utterance(utterance: str) -> str:
+    openai.api_key = os.getenv("OPENAI_API_KEY")
+
+    response = openai.Completion.create(
+          engine="davinci",
+          prompt="The following is a conversation with an AI assistant. The assistant is helpful, creative, clever, and very friendly.\n\nHuman: Hello, who are you?\nAI: I am an AI created by OpenAI. How can I help you today?\nHuman: I'd like to cancel my subscription.\nAI:",
+          temperature=0.9,
+          max_tokens=150,
+          top_p=1,
+          frequency_penalty=0.0,
+          presence_penalty=0.6,
+          stop=["\n", " Human:", " AI:"]
+        )
+    return response
+
+@cache
+def openai_situation(location : str) -> str:
+    openai.api_key = os.getenv("OPENAI_API_KEY")
+
+    response = openai.Completion.create(
+          engine="davinci-instruct-beta",
+          prompt="Create a list of things you can do at a {}:".format(location),
+          temperature=0.8,
+          max_tokens=1024,
+          top_p=1,
+          frequency_penalty=0,
+          presence_penalty=0.4,
+          stop=["\n\n"]
+        )
+    return response
+
+
+
 def blenderbot1B(utterance: str) -> List[str]:
     """DONT USE THIS """
     responses = ['dont use this']
@@ -38,6 +74,7 @@ def blenderbot1B(utterance: str) -> List[str]:
 
 
 def questions(question: str, text: str) -> List[str]:
+    
     tokenizer = AutoTokenizer.from_pretrained('ibert-roberta-base')
     model = AutoTokenizer.from_pretrained('ibert-roberta-base')
 
@@ -83,6 +120,7 @@ def checkpoint_optimization(utterance: str, checkpoint: Any) -> Tuple[str]:
     print(tokenizer.decode(outputs[0]))
 
 def conversation(utterance: str, continuing_conversation=False):
+    torch.random.seed()
     element_to_access = random.randint(0,len(letters)-1)
     conv1_start = blenderbot400M(utterance)[element_to_access]
     #conv1_start = "Let's watch a movie tonight - any recommendations?"
@@ -98,8 +136,9 @@ def conversation(utterance: str, continuing_conversation=False):
 
 @cache
 def blenderbot3B(utterance: str):
+    torch.random.seed()
     tokenizer = AutoTokenizer.from_pretrained("facebook/blenderbot-3B")
-
+    
     model = AutoModelForSeq2SeqLM.from_pretrained("facebook/blenderbot-3B")
     inputs = tokenizer([utterance], return_tensors="pt")
     reply_ids = model.generate(**inputs)
