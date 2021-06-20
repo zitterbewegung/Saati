@@ -7,6 +7,9 @@ from transformers import (
     BlenderbotForConditionalGeneration,
     Conversation,
 )
+from transformers import DetrFeatureExtractor, DetrForObjectDetection
+from PIL import Image
+import requests
 import torch
 import random
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
@@ -241,6 +244,21 @@ def answer_questions_conversations(identifier: str, question: str):
     a model on a SQuAD task, you may leverage the examples/pytorch/question-answering/run_squad.py script.
     """
     pass
+
+def identify_whats_in_image(url: str):
+    #url = 'http://images.cocodataset.org/val2017/000000039769.jpg'
+    image = Image.open(requests.get(url, stream=True).raw)
+
+    feature_extractor = DetrFeatureExtractor.from_pretrained('facebook/detr-resnet-50')
+    model = DetrForObjectDetection.from_pretrained('facebook/detr-resnet-50')
+
+    inputs = feature_extractor(images=image, return_tensors="pt")
+    outputs = model(**inputs)
+
+    # model predicts bounding boxes and corresponding COCO classes
+    logits = outputs.logits
+    bboxes = outputs.pred_boxes
+    return outputs, logits, bboxes
 
 #@app.task
 def tacotron2(text_to_bounce: str, file_path: str) -> Tuple[str]:
