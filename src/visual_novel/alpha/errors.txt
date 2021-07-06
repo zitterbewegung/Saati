@@ -1,0 +1,10 @@
+﻿I'm sorry, but errors were detected in your script. Please correct the
+errors listed below, and try again.
+
+
+File "game/script.rpy", line 43: reached end of line when expecting ':'.
+    if connected is "yes"
+                         ^
+
+Ren'Py Version: Ren'Py 7.3.5.606
+Mon Jul  5 19:41:01 2021
