@@ -1,0 +1,26 @@
+﻿I'm sorry, but an uncaught exception occurred.
+
+While running game code:
+  File "game/script.rpy", line 32, in script
+    python:
+  File "game/script.rpy", line 39, in <module>
+    data = urllib2.urlencode({'name' : playerName,'score' : playerScore})
+AttributeError: 'module' object has no attribute 'urlencode'
+
+-- Full Traceback ------------------------------------------------------------
+
+Full traceback:
+  File "game/script.rpy", line 32, in script
+    python:
+  File "/Applications/renpy-7.3.5-sdk/renpy/ast.py", line 914, in execute
+    renpy.python.py_exec_bytecode(self.code.bytecode, self.hide, store=self.store)
+  File "/Applications/renpy-7.3.5-sdk/renpy/python.py", line 2028, in py_exec_bytecode
+    exec bytecode in globals, locals
+  File "game/script.rpy", line 39, in <module>
+    data = urllib2.urlencode({'name' : playerName,'score' : playerScore})
+AttributeError: 'module' object has no attribute 'urlencode'
+
+Darwin-21.0.0-x86_64-i386-64bit
+Ren'Py 7.3.5.606
+saati_alpha 1.0
+Mon Jul  5 19:35:59 2021
