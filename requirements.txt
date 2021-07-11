@@ -263,7 +263,7 @@ unicorn==1.0.3
 urllib3==1.26.4
 uvicorn==0.14.0
 vine==5.0.0
-wagtail==2.13
+wagtail==2.13.2
 wcwidth==0.2.5
 webencodings==0.5.1
 webrtcvad==2.0.10
