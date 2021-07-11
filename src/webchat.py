@@ -3,7 +3,7 @@ from flask import Flask, render_template, request, session, make_response
 # from chatterbot import ChatBot
 # from chatterbot.trainers import ChatterBotCorpusTrainer
 from flask import send_file
-
+import uvicorn
 from logic import answer_question
 import sys, logging, os, uuid
 
@@ -76,4 +76,4 @@ def get_bot_response():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", debug=False, port=5002)
+    app.run(debug=True, port=80, host='0.0.0.0')

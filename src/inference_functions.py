@@ -22,7 +22,7 @@ import openai
 
 #conversational_pipeline = pipeline("conversational", device=0)
 
-@cache
+
 def blenderbot400M(utterance: str) -> List[str]:
     torch.random.seed()
     tokenizer = AutoTokenizer.from_pretrained("facebook/blenderbot-400M-distill")
@@ -137,7 +137,7 @@ def conversation(utterance: str, continuing_conversation=False):
 
     #conversational_pipeline([conv1, conv2])
 
-@cache
+
 def blenderbot3B(utterance: str):
     torch.random.seed()
     tokenizer = AutoTokenizer.from_pretrained("facebook/blenderbot-3B")
