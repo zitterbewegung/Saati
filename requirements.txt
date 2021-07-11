@@ -260,7 +260,7 @@ typing==3.7.4.3
 typing-extensions==3.7.4.3
 ujson==4.0.2
 unicorn==1.0.3
-urllib3==1.26.4
+urllib3==1.26.5
 uvicorn==0.14.0
 vine==5.0.0
 wagtail==2.13
