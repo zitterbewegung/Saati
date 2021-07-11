@@ -39,7 +39,7 @@ datasets==1.8.0
 decorator==4.4.2
 defusedxml==0.7.1
 dill==0.3.3
-Django==3.2.3
+Django==3.2.4
 django-filter==2.4.0
 django-modelcluster==5.1
 django-taggit==1.4.0
